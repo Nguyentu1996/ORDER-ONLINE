@@ -55,13 +55,14 @@ namespace WebDeApplication
                 options.Password.RequireNonAlphanumeric = false;
             })
                 .AddEntityFrameworkStores<ApplicationDbContext>();
-
+            // Add Database Initializer
+            services.AddScoped<IDbInitializer, DbInitializer>();
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, IDbInitializer dbInitializer)
         {
             if (env.IsDevelopment())
             {
@@ -80,7 +81,8 @@ namespace WebDeApplication
             //app.UseOAuthAuthentication();
 
             app.UseAuthentication();
-
+            //Generate EF Core Seed Data
+            dbInitializer.Initialize();
 
             app.UseMvc(routes =>
             {

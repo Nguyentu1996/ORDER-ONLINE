@@ -56,11 +56,11 @@ namespace WebDeApplication.Controllers
             var roles = roleManager.Roles;
             return View(roles);
         }
-        //public IActionResult Index()
-        //{
-        //    var roles = roleManager.Roles;
-        //    return View(roles);
-        //}
+        public IActionResult Index()
+        {
+            
+            return RedirectToAction("ListRole");
+        }
         [HttpGet]
         public async Task<IActionResult> EditRole(string id)
         {

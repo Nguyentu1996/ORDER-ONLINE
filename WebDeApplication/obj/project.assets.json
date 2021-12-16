@@ -13517,23 +13517,19 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\WI10\\.nuget\\packages\\": {},
-    "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder": {}
+    "C:\\Users\\n_tu\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\Csharp\\Remember\\FromTu2\\WebDeApplication\\WebDeApplication.csproj",
+      "projectUniqueName": "D:\\Source_n_tu\\ASP-NET\\ORDER-ONLINE\\ORDER-ONLINE\\WebDeApplication\\WebDeApplication.csproj",
       "projectName": "WebDeApplication",
-      "projectPath": "D:\\Csharp\\Remember\\FromTu2\\WebDeApplication\\WebDeApplication.csproj",
-      "packagesPath": "C:\\Users\\WI10\\.nuget\\packages\\",
-      "outputPath": "D:\\Csharp\\Remember\\FromTu2\\WebDeApplication\\obj\\",
+      "projectPath": "D:\\Source_n_tu\\ASP-NET\\ORDER-ONLINE\\ORDER-ONLINE\\WebDeApplication\\WebDeApplication.csproj",
+      "packagesPath": "C:\\Users\\n_tu\\.nuget\\packages\\",
+      "outputPath": "D:\\Source_n_tu\\ASP-NET\\ORDER-ONLINE\\ORDER-ONLINE\\WebDeApplication\\obj\\",
       "projectStyle": "PackageReference",
-      "fallbackFolders": [
-        "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
-      ],
       "configFilePaths": [
-        "C:\\Users\\WI10\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\n_tu\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
@@ -13545,7 +13541,6 @@
       },
       "frameworks": {
         "netcoreapp2.2": {
-          "targetAlias": "netcoreapp2.2",
           "projectReferences": {}
         }
       },
@@ -13557,7 +13552,6 @@
     },
     "frameworks": {
       "netcoreapp2.2": {
-        "targetAlias": "netcoreapp2.2",
         "dependencies": {
           "EPPlus": {
             "target": "Package",
@@ -13637,7 +13631,7 @@
         ],
         "assetTargetFallback": true,
         "warn": true,
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.100\\RuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\3.1.202\\RuntimeIdentifierGraph.json"
       }
     }
   }

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -10,7 +9,6 @@ namespace WebDeApplication.Models
 
     public class DataProfitOrder
     {   
-        [Key]
         public int Id { get; set; }
         public string ODnumber { get; set; }
         public string Name { get; set; }
@@ -23,7 +21,6 @@ namespace WebDeApplication.Models
         public string DaMua { get; set; }
         public string GiaUSD { get; set; }
         public Boolean orderStop { get; set; }
-
         public string GiaSale { get; set; }
         public string TongUSD { get; set; }
     }
