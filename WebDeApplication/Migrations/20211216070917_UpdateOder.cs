@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace WebDeApplication.Migrations
 {
-    public partial class InitDb : Migration
+    public partial class UpdateOder : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -48,6 +48,29 @@ namespace WebDeApplication.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "DashboardData",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                    Year = table.Column<int>(nullable: false),
+                    Month = table.Column<int>(nullable: false),
+                    TotalProfit = table.Column<float>(nullable: false),
+                    PercentProfit = table.Column<float>(nullable: false),
+                    TotalOrder = table.Column<int>(nullable: false),
+                    PercentOrder = table.Column<float>(nullable: false),
+                    TotalCancel = table.Column<int>(nullable: false),
+                    PercentCancel = table.Column<float>(nullable: false),
+                    TotalDelay = table.Column<int>(nullable: false),
+                    PercentDelay = table.Column<float>(nullable: false),
+                    SiteName = table.Column<string>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_DashboardData", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "DataDauVao",
                 columns: table => new
                 {
@@ -77,11 +100,81 @@ namespace WebDeApplication.Migrations
                     Status = table.Column<string>(nullable: true),
                     isChecked = table.Column<bool>(nullable: false),
                     stopOrder = table.Column<bool>(nullable: false),
-                    CreateDate = table.Column<long>(nullable: false)
+                    CreateDate = table.Column<long>(nullable: false),
+                    tyGiaMua = table.Column<int>(nullable: false),
+                    tyGiaBan = table.Column<int>(nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_DataDauVao", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "DataProfitOrder",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                    ODnumber = table.Column<string>(nullable: true),
+                    Name = table.Column<string>(nullable: true),
+                    NgayGui = table.Column<string>(nullable: true),
+                    TotalProfit = table.Column<float>(nullable: false),
+                    SiteName = table.Column<string>(nullable: true),
+                    tyGiaMua = table.Column<int>(nullable: false),
+                    tyGiaBan = table.Column<int>(nullable: false),
+                    CanMua = table.Column<string>(nullable: true),
+                    DaMua = table.Column<string>(nullable: true),
+                    GiaUSD = table.Column<string>(nullable: true),
+                    orderStop = table.Column<bool>(nullable: false),
+                    GiaSale = table.Column<string>(nullable: true),
+                    TongUSD = table.Column<string>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_DataProfitOrder", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "EmailCancel",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                    ODNumber = table.Column<string>(nullable: true),
+                    ODParrent = table.Column<string>(nullable: true),
+                    Status = table.Column<string>(nullable: true),
+                    Name = table.Column<string>(nullable: true),
+                    Shippto = table.Column<string>(nullable: true),
+                    Month = table.Column<int>(nullable: false),
+                    Year = table.Column<int>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_EmailCancel", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "EmailDelay",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                    EmailId = table.Column<int>(nullable: false),
+                    ODNumber = table.Column<string>(nullable: true),
+                    ODParrent = table.Column<string>(nullable: true),
+                    receivedTime = table.Column<string>(nullable: true),
+                    fromAddress = table.Column<string>(nullable: true),
+                    status = table.Column<string>(nullable: true),
+                    shippto = table.Column<string>(nullable: true),
+                    tracking = table.Column<string>(nullable: true),
+                    name = table.Column<string>(nullable: true),
+                    orderTotal = table.Column<string>(nullable: true),
+                    shipped = table.Column<bool>(nullable: false),
+                    estimatime = table.Column<DateTime>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_EmailDelay", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -92,6 +185,7 @@ namespace WebDeApplication.Migrations
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
                     EmailId = table.Column<int>(nullable: false),
                     ODNumber = table.Column<string>(nullable: true),
+                    ODParrent = table.Column<string>(nullable: true),
                     toAddress = table.Column<string>(nullable: true),
                     receivedTime = table.Column<string>(nullable: true),
                     fromAddress = table.Column<string>(nullable: true),
@@ -101,7 +195,9 @@ namespace WebDeApplication.Migrations
                     tracking = table.Column<string>(nullable: true),
                     name = table.Column<string>(nullable: true),
                     orderTotal = table.Column<string>(nullable: true),
-                    priority = table.Column<string>(nullable: true)
+                    received = table.Column<DateTime>(nullable: false),
+                    shipped = table.Column<bool>(nullable: false),
+                    estimatime = table.Column<DateTime>(nullable: false)
                 },
                 constraints: table =>
                 {
@@ -332,7 +428,19 @@ namespace WebDeApplication.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
+                name: "DashboardData");
+
+            migrationBuilder.DropTable(
                 name: "DataDauVao");
+
+            migrationBuilder.DropTable(
+                name: "DataProfitOrder");
+
+            migrationBuilder.DropTable(
+                name: "EmailCancel");
+
+            migrationBuilder.DropTable(
+                name: "EmailDelay");
 
             migrationBuilder.DropTable(
                 name: "EmailGroup");

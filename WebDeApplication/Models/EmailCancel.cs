@@ -10,7 +10,7 @@ namespace WebDeApplication.Models
 
     public class EmailCancel
     {
-        [Key]
+        public int Id { get; set; }
         public string ODNumber { get; set; }
         public string ODParrent { get; set; }
 

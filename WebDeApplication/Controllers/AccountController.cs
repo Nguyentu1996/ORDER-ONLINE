@@ -33,7 +33,7 @@ namespace WebDeApplication.Controllers
             if (ModelState.IsValid)
             {
                 model.ConfirmPassword = model.Password;
-                var user = new IdentityUser { UserName = model.Email, Email = model.Email };
+                var user = new IdentityUser { UserName = model.UserName, Email = model.Email,  };
                 //var result = await userManager.CreateAsync(user);
                 var result = await userManager.CreateAsync(user, model.Password);
                 
@@ -69,7 +69,7 @@ namespace WebDeApplication.Controllers
         {
             if (ModelState.IsValid)
             {
-                var result = await signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, false);
+                var result = await signInManager.PasswordSignInAsync(model.UserName, model.Password, model.RememberMe, false);
 
                 if (result.Succeeded)
                 {

@@ -47,21 +47,22 @@ namespace WebDeApplication
                 options.Filters.Add(new AuthorizeFilter(policy));
             }).AddXmlSerializerFormatters();
 
+            // Add Database Initializer
+            //services.AddScoped<IDbInitializer, DbInitializer>();
 
             services.AddIdentity<IdentityUser, IdentityRole>(options =>
             {
                 options.Password.RequiredLength = 6;
                 options.Password.RequiredUniqueChars = 3;
                 options.Password.RequireNonAlphanumeric = false;
-            })
-                .AddEntityFrameworkStores<ApplicationDbContext>();
+            }).AddEntityFrameworkStores<ApplicationDbContext>();
 
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, UserManager<IdentityUser> userManager, RoleManager<IdentityRole> roleManager)
         {
             if (env.IsDevelopment())
             {
@@ -80,7 +81,7 @@ namespace WebDeApplication
             //app.UseOAuthAuthentication();
 
             app.UseAuthentication();
-
+    
 
             app.UseMvc(routes =>
             {
@@ -88,6 +89,8 @@ namespace WebDeApplication
                     name: "default",
                     template: "{controller=Datadauvaos}/{action=Index}");
             });
+            //Generate EF Core Seed Data
+            DbInitializer.SeedData(userManager,roleManager);
         }
     }
 }

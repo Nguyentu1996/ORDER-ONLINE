@@ -427,7 +427,15 @@ namespace WebDeApplication.Controllers
                     var messID = _context.EmailReader.FirstOrDefault(e => e.messageId == mail.messageId);
                     if (messID != null) continue;
                     EmailContent emailContent = await GetEmailContent(mail.messageId, received);
-
+                    if(emailContent == null)
+                    {
+                        using (var httpClient = new HttpClient())
+                        {
+                            received = await OauthRefreshToken(httpClient, received);
+                            emailContent = await GetEmailContent(mail.messageId, received);
+                        }
+                    }
+                    if (emailContent.data == null) continue;
                     var tempData = emailContent.data.content;
 
                     var tempMail = tempData.Split("address");
@@ -532,10 +540,7 @@ namespace WebDeApplication.Controllers
                             {
                                 //no estimateDilivery
                             }
-
-
                         }
-
                         var oderTotal1 = orderTotal.Split("Gift Card:");
                         if (oderTotal1.Length < 2) continue;
                         var oderTotal2 = oderTotal1[1].Split("<br /> </td>");
@@ -900,28 +905,7 @@ namespace WebDeApplication.Controllers
 
                 }
                 _context.SaveChanges();
-                //add or update order cancel
-                var deleteEmail = _context.EmailReader.Where(e => e.status2 == "-1").Select(e => e).ToList();
-                for (int i = 0; i < deleteEmail.Count; i++)
-                {
-                    var cancelEmail = _context.EmailReader.Where(e => e.ODNumber == deleteEmail[i].ODNumber && e.status2 == "1" && e.priority != "cancel" && e.odParrent != null).FirstOrDefault();
-                    cancelEmail.priority = "cancel";
-                    var emailCancel = new EmailCancel();
-                    emailCancel.Name = cancelEmail.name;
-                    emailCancel.ODParrent = cancelEmail.odParrent;
-                    emailCancel.ODNumber = cancelEmail.ODNumber;
-                    emailCancel.Shippto = cancelEmail.shippto;
-                    emailCancel.Status = cancelEmail.status;
-                    var time = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc).AddMilliseconds(cancelEmail.receivedTimeLong).ToLocalTime();
-                    emailCancel.Month = time.Month;
-                    emailCancel.Year = time.Year;
-                    _context.EmailReader.Update(cancelEmail);
-                    _context.EmailCancel.Add(emailCancel);
-
-                }
-                _context.SaveChanges();
-
-
+               
                 //update order
                 _context.DataDauVao.Where(order => order.ODNumber != null && order.stopOrder != true && order.CanMua != null).ToList().ForEach(order =>
                 {
@@ -968,6 +952,27 @@ namespace WebDeApplication.Controllers
                         }
                     }
                 });
+
+                //add or update order cancel
+                var deleteEmail = _context.EmailReader.Where(e => e.status2 == "-1").Select(e => e).ToList();
+                for (int i = 0; i < deleteEmail.Count; i++)
+                {
+                    var cancelEmail = _context.EmailReader.Where(e => e.ODNumber == deleteEmail[i].ODNumber && e.status2 == "1" && e.priority != "cancel" && e.odParrent != null).FirstOrDefault();
+                    cancelEmail.priority = "cancel";
+                    var emailCancel = new EmailCancel();
+                    emailCancel.Name = cancelEmail.name;
+                    emailCancel.ODParrent = cancelEmail.odParrent;
+                    emailCancel.ODNumber = cancelEmail.ODNumber;
+                    emailCancel.Shippto = cancelEmail.shippto;
+                    emailCancel.Status = cancelEmail.status;
+                    var time = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc).AddMilliseconds(cancelEmail.receivedTimeLong).ToLocalTime();
+                    emailCancel.Month = time.Month;
+                    emailCancel.Year = time.Year;
+                    _context.EmailReader.Update(cancelEmail);
+                    _context.EmailCancel.Add(emailCancel);
+
+                }
+                _context.SaveChanges();
 
                 // Update email group
                 _context.Database.ExecuteSqlCommand("DELETE FROM [EmailGroup]");
@@ -1183,14 +1188,15 @@ namespace WebDeApplication.Controllers
                 {
                     string mailContentResponse = await res.Content.ReadAsStringAsync();
                     data = JsonConvert.DeserializeObject<EmailContent>(mailContentResponse);
-                } else
-                {
-                    using (var httpClient = new HttpClient())
-                    {
-                        receivied = await OauthRefreshToken(httpClient, receivied);
-                        return await GetEmailContent(messageID, receivied);
-                    }
-                }
+                } 
+                //else
+                //{
+                //    using (var httpClient = new HttpClient())
+                //    {
+                //        receivied = await OauthRefreshToken(httpClient, receivied);
+                //        return await GetEmailContent(messageID, receivied);
+                //    }
+                //}
                
 
             }

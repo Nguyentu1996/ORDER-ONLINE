@@ -5,14 +5,13 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using WebDeApplication.Models;
 using WebDeApplication.Models.Data;
 
 namespace WebDeApplication.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20211216051113_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20211216070917_UpdateOder")]
+    partial class UpdateOder
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -320,12 +319,15 @@ namespace WebDeApplication.Migrations
 
             modelBuilder.Entity("WebDeApplication.Models.EmailCancel", b =>
                 {
-                    b.Property<string>("ODNumber")
-                        .ValueGeneratedOnAdd();
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<int>("Month");
 
                     b.Property<string>("Name");
+
+                    b.Property<string>("ODNumber");
 
                     b.Property<string>("ODParrent");
 
@@ -335,7 +337,7 @@ namespace WebDeApplication.Migrations
 
                     b.Property<int>("Year");
 
-                    b.HasKey("ODNumber");
+                    b.HasKey("Id");
 
                     b.ToTable("EmailCancel");
                 });
@@ -415,7 +417,6 @@ namespace WebDeApplication.Migrations
 
                     b.ToTable("EmailGroup");
                 });
-            modelBuilder.Entity<EmailGroup>().HasIndex(p => p.ODParrent);
 
             modelBuilder.Entity("WebDeApplication.Models.EmailReader", b =>
                 {
@@ -479,8 +480,6 @@ namespace WebDeApplication.Migrations
 
                     b.ToTable("EmailReader");
                 });
-            modelBuilder.Entity<EmailReader>().HasIndex(p => p.odParrent);
-           //.IsUnique();
 
             modelBuilder.Entity("WebDeApplication.Models.Item", b =>
                 {
@@ -512,9 +511,6 @@ namespace WebDeApplication.Migrations
 
                     b.ToTable("Item");
                 });
-
-            modelBuilder.Entity<Item>().HasIndex(p => p.ODnumber);
-            //.IsUnique();
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
