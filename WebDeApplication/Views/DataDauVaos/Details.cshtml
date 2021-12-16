@@ -1,0 +1,369 @@
+﻿@model WebDeApplication.Models.DataDauVao
+@namespace WebDeApplication.Models.Dto
+@{
+    ViewData["Title"] = "Details";
+}
+
+
+<div class="row">
+    <!-- [ form-element ] start -->
+    <div class="col-sm-12">
+        <div class="card">
+            <div class="card-header">
+                <h5>Info data</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <form asp-action="Create" class="row" style="width:100%">
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label asp-for="Name" class="control-label"></label>
+                                <input asp-for="Name" class="form-control " readonly />
+                                <span asp-validation-for="Name" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="Adress" class="control-label"></label>
+                                <input asp-for="Adress" class="form-control " readonly />
+                                <span asp-validation-for="Adress" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="NgayGui" class="control-label"></label>
+                                <input asp-for="NgayGui" class="form-control datepicker" readonly />
+                                <span asp-validation-for="NgayGui" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="MaSP" class="control-label"></label>
+                                <input asp-for="MaSP" class="form-control" readonly />
+                                <span asp-validation-for="MaSP" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="LinkSanPham" class="control-label"></label>
+                                <input asp-for="LinkSanPham" class="form-control" readonly />
+                                <span asp-validation-for="LinkSanPham" class="text-danger"></span>
+                            </div>
+                            @*<div class="d-flex align-content-center" style="height:40px">
+
+                                <div class="form-check px-0">
+                                    @Html.CheckBoxFor(model => model.isChecked)
+
+                                    <label class="form-check-label">
+                                        Status
+                                    </label>
+                                </div>
+                            </div>*@
+                            <div class="form-group text-left mt-2">
+                                <div class="checkbox checkbox-primary d-inline">
+                                    <input type="checkbox" asp-for="stopOrder" name="checkbox-fill-1" id="checkbox-fill-a1">
+                                    <label for="checkbox-fill-a1" class="cr">Stop Order</label>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="col-md-3">
+
+                            <div class="form-group">
+                                <label asp-for="CanMua" class="control-label"></label>
+                                <input asp-for="CanMua" class="form-control" readonly />
+                                <span asp-validation-for="CanMua" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="DaMua" class="control-label"></label>
+                                <input asp-for="DaMua" class="form-control" readonly />
+                                <span asp-validation-for="DaMua" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="GiaUSD" class="control-label"></label>
+                                <input asp-for="GiaUSD" class="form-control" readonly />
+                                <span asp-validation-for="GiaUSD" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="GiaSale" class="control-label"></label>
+                                <input asp-for="GiaSale" class="form-control" readonly />
+                                <span asp-validation-for="GiaSale" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="ShipOrTax" class="control-label"></label>
+                                <input asp-for="ShipOrTax" class="form-control" readonly />
+                                <span asp-validation-for="ShipOrTax" class="text-danger"></span>
+                            </div>
+
+
+                        </div>
+                        <div class="col-md-3">
+
+                            <div class="form-group">
+                                <label asp-for="TongUSD" class="control-label"></label>
+                                <input asp-for="TongUSD" class="form-control" readonly />
+                                <span asp-validation-for="TongUSD" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="Rate" class="control-label"></label>
+                                <input asp-for="Rate" class="form-control" readonly />
+                                <span asp-validation-for="Rate" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="TongVND" class="control-label"></label>
+                                <input asp-for="TongVND" class="form-control" readonly />
+                                <span asp-validation-for="TongVND" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="GhiChu" class="control-label"></label>
+                                <input asp-for="GhiChu" class="form-control" readonly />
+                                <span asp-validation-for="GhiChu" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="Size" class="control-label"></label>
+                                <input asp-for="Size" class="form-control" readonly />
+                                <span asp-validation-for="Size" class="text-danger"></span>
+                            </div>
+
+                        </div>
+                        <div class="col-md-3">
+
+                            <div class="form-group">
+                                <label asp-for="ItemInTrack" class="control-label"></label>
+                                <input asp-for="ItemInTrack" class="form-control" readonly />
+                                <span asp-validation-for="ItemInTrack" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="LinkTrack" class="control-label"></label>
+                                <input asp-for="LinkTrack" class="form-control" readonly />
+                                <span asp-validation-for="LinkTrack" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="Payment" class="control-label"></label>
+                                <input asp-for="Payment" class="form-control" readonly />
+                                <span asp-validation-for="Payment" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="Debt" class="control-label"></label>
+                                <input asp-for="Debt" class="form-control" readonly />
+                                <span asp-validation-for="Debt" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="Mau" class="control-label"></label>
+                                <input asp-for="Mau" class="form-control" readonly />
+                                <span asp-validation-for="Mau" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label asp-for="ODNumber" class="control-label"></label>
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="form-group" style="max-height: 400px; overflow:auto">
+                                    @foreach (var item in ViewData["ListODnumber"] as List<OdNumberStatus>)
+                                    {
+                                        string style = item.Shipped ? "background-color:yellow" : null;
+
+                                        <a style="@style" class="pointer-events" onclick="location.href = '@(Url.Action("EmailReaderDetails", "DataDauVaos", new { id = item.Id }))'">
+                                            @item.OdNumber
+                                        </a>
+                                        <span>, </span>
+                                     }
+                                @* ussing viewData <textarea readonly asp-for="ODNumber" class="form-control" id="exampleFormControlTextarea1" rows="3"></textarea>
+                                    <span asp-validation-for="ODNumber" class="text-danger"></span>*@
+
+                            </div>
+                        </div>
+                    </form>
+                    <a href="javascript:history.go(-1)" class="btn btn-light">Back</a>
+                    <a onclick="location.href = '@(Url.Action("Edit", "DataDauVaos", new { id = @Model.Id }))'" class="btn btn-primary text-light">Edit</a>
+                    <a onclick="location.href = '@(Url.Action("Delete", "DataDauVaos", new { id = @Model.Id }))'" class="btn btn-danger text-light">Delete</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- [ form-element ] end -->
+    <div class="col-xl-12 col-md-12">
+        <div class="card table-card">
+            <div class="card-header">
+                <h5 class="mb-0">List data</h5>
+                @*<div class="card-header-right">
+                        <form asp-action="Import" method="post" enctype="multipart/form-data">
+                            <input type="file" name="postedFile" id="fileupload" />
+                            <button type="submit" class="btn btn-primary mb-2" id="btnupload">Import</button>
+                            <a style="float:right" class="btn btn-primary mb-2" asp-action="Create">Create</a>
+                        </form>
+                    </div>*@
+            </div>
+            <div class="card-body px-0 py-0">
+                <div class="table-responsive">
+                    <div class="session-scroll" style="position:relative;">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>
+                                        @Html.DisplayNameFor(model => model.ODNumber)
+                                    </th>
+                                    <th>
+                                        Name
+                                    </th>
+                                    <th>
+                                        Status
+                                    </th>
+                                    <th>
+                                        Address
+                                    </th>
+                                    <th>
+                                        Shippto
+                                    </th>
+
+                                    @*<th>
+                                        Subject
+                                    </th>
+                                    <th>
+                                        Summary
+                                    </th>*@
+                                    <th>
+                                        FromAddress
+                                    </th>
+                                    <th>
+                                        Tracking
+                                    </th>
+                                    <th>
+                                        ReceivedTime
+                                    </th>
+                                    <th>
+                                        Shipped
+
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in ViewData["emailList"] as List<EmailReader>)
+                                {
+                              
+                                    string style = item.shipped ? "background-color:yellow" : null;
+                                    var param = new Dictionary<string, string> {
+                                            { "idOrder", Context.Request.Query["id"].ToString()},
+                                            { "page",  Context.Request.Query["page"].ToString() },
+                                            { "id", item.Id.ToString() },
+
+                                        };
+                                    <tr id="tr_@item.Id">
+                                        <td>
+                                            
+                                            <a style="@style" class="pointer-events" onclick="location.href = '@(Url.Action("EmailReaderDetails", "DataDauVaos", new { id = item.Id }))'">
+                                                @Html.DisplayFor(modelItem => item.ODNumber)
+                                            </a>
+                                        </td>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.name)
+                                        </td>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.status)
+                                        </td>
+                                        <td style="max-width:200px; overflow:hidden" data-toggle="tooltip" data-placement="top" title="@item.address">
+                                            @Html.DisplayFor(modelItem => item.address)
+                                        </td>
+                                        <td style="max-width:200px; overflow:hidden" data-toggle="tooltip" data-placement="top" title="@item.shippto">
+                                            @Html.DisplayFor(modelItem => item.shippto)
+                                        </td>
+                                        @*<td style="max-width:200px; overflow:hidden" data-toggle="tooltip" data-placement="top" title="@item.subject">
+                                            @Html.DisplayFor(modelItem => item.subject)
+                                        </td>
+                                        <td style="max-width:200px; overflow:hidden" data-toggle="tooltip" data-placement="top" title="@item.summary">
+                                            @Html.DisplayFor(modelItem => item.summary)
+                                        </td>*@
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.fromAddress)
+                                        </td>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.tracking)
+
+                                        </td>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.receivedTime)
+                                        </td>
+
+                                        <td  >
+                                            <a asp-controller="DataDauVaos" asp-action="Shipped" asp-all-route-data="param">Shipped</a>
+                                        </td>
+                                    </tr>  
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <nav aria-label="Page navigation example">
+                    <ul class="pagination justify-content-end px-3 mt-3">
+                        <li style="display:flex;align-items:center">
+                            <p class="m-0 mx-3">Total @ViewBag.totalData</p>
+                        </li>
+                        @{
+                            int numberPage = ViewBag.numberPage;
+                            int pageCurrent = ViewBag.pageCurrent;
+                            int offset = 2;//number display page
+
+
+                            //config FirstLink
+                            if (pageCurrent > 1)
+                            {
+                                int prevPage = pageCurrent - 1;
+                                var PrevLink = new Dictionary<string, string> {
+                                            { "id", Context.Request.Query["id"].ToString()},
+                                            { "page", prevPage.ToString() }
+                                        };
+                                <li class="page-item"><a asp-controller="DataDauVaos" asp-action="Details" asp-all-route-data="PrevLink" class="page-link">Prev Link</a></li>
+                            }
+
+                            int from = pageCurrent - offset;
+                            int to = pageCurrent + offset;
+                            if (from <= 0)
+                            {
+                                from = 1;
+                                to = offset * 2;
+                            }
+
+
+                            if (to > numberPage)
+                            {
+                                to = numberPage;
+                            }
+
+                            int x;
+                            for (x = from; x <= to; x++)
+                            {
+                                var parms = new Dictionary<string, string>                                                                                                                                                                                                                                         {
+                                             { "id", Context.Request.Query["id"].ToString()},
+                                             { "page",x.ToString() }
+                                        };
+                                if (pageCurrent == x)
+                                {
+                                    <li class="page-item active"><a asp-controller="DataDauVaos" asp-action="Details" asp-all-route-data="parms" class="page-link">@x</a></li>
+                                }
+                                else
+                                {
+                                    <li class="page-item"><a asp-controller="DataDauVaos" asp-action="Details" asp-all-route-data="parms" class="page-link">@x</a></li>
+                                }
+
+                            }
+
+                            if (pageCurrent < numberPage - (to / 2))
+                            {
+                                <li class="page-item"><a class="page-link">...</a></li>
+                                var LastLink = new Dictionary<string, string> {
+                                             { "id", Context.Request.Query["id"].ToString()},
+                                             { "page",numberPage.ToString() } };
+                                <li class="page-item"><a asp-controller="DataDauVaos" asp-action="Details" asp-all-route-data="LastLink" class="page-link">Last Link</a></li>
+                            }
+
+                            if (pageCurrent < numberPage)
+                            {
+                                int nextPage = pageCurrent + 1;
+                                var NextLink = new Dictionary<string, string> {
+                                             { "id", Context.Request.Query["id"].ToString()},
+                                             { "page",nextPage.ToString() }  };
+                                <li class="page-item"><a asp-controller="DataDauVaos" asp-action="Details" asp-all-route-data="NextLink" class="page-link">Next Link</a></li>
+                            }
+                        }
+                    </ul>
+                </nav>
+
+            </div>
+        </div>
+    </div>
+
+</div>

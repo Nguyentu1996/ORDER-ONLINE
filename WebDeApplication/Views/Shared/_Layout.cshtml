@@ -1,0 +1,303 @@
+﻿
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - WebDeApplication</title>
+
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.css" />
+
+    <link rel="stylesheet"
+          asp-fallback-href="~/lib/bootstrap/dist/css/bootstrap.min.css"
+          asp-fallback-test-class="sr-only" asp-fallback-test-property="position" asp-fallback-test-value="absolute"
+          crossorigin="anonymous"
+          integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" />
+    @* flat layout styles  *@
+    <!-- fontawesome icon -->
+    <link rel="stylesheet" href="~/fonts/fontawesome/css/fontawesome-all.min.css">
+    <!-- animation css -->
+    <link rel="stylesheet" href="~/plugins/animation/css/animate.min.css">
+    <!-- vendor css -->
+    <link rel="stylesheet" href="~/css/style.css" />
+    <link rel="stylesheet" href="~/plugins/jquery-scrollbar//css/perfect-scrollbar.css" />
+
+    @*<script src="~/js/vendor-all.min.js"></script>*@
+    @*<script src="~/js/pcoded.min.js"></script>*@
+    @*<link rel="stylesheet" href="//code.jquery.com/ui/1.13.0/themes/base/jquery-ui.css">*@
+    <script src="https://code.jquery.com/jquery-3.6.0.js"></script>
+    @*<script src="https://code.jquery.com/ui/1.13.0/jquery-ui.js"></script>*@
+
+
+
+    <style>
+    </style>
+</head>
+@*<body onload="hidene(),luutrudulieu();">*@
+<body>
+    @using Microsoft.AspNetCore.Identity;
+
+    @inject SignInManager<IdentityUser> SignInManager
+    @inject UserManager<IdentityUser> UserManager
+    <!-- [ Pre-loader ] start -->
+    <div class="loader-bg" style="visibility: hidden">
+        <div class="loader-track">
+            <div class="loader-fill"></div>
+        </div>
+    </div>
+    <!-- [ Pre-loader ] End -->
+    <!-- [ navigation menu ] start -->
+    <nav class="pcoded-navbar menupos-fixed menu-light brand-blue ">
+        <div class="navbar-wrapper ">
+            <div class="navbar-brand header-logo">
+                <a asp-controller="DataDauVaos" asp-action="Index" class="b-brand">
+                    <img src="~/images/logo.svg" alt="" class="logo images">
+                    <img src="~/images/logo-icon.svg" alt="" class="logo-thumb images">
+                </a>
+                <a class="mobile-menu" id="mobile-collapse" href="#!"><span></span></a>
+            </div>
+            <div class="navbar-content scroll-div">
+                <ul class="nav pcoded-inner-navbar">
+                    <li class="nav-item pcoded-menu-caption">
+                        <label>Navigation</label>
+                    </li>
+                    <li class="nav-item">
+                        <a asp-controller="DataDauVaos" asp-action="Index" class="nav-link"><span class="pcoded-micon"><i class="feather icon-home"></i></span><span class="pcoded-mtext">Dashboard</span></a>
+                    </li>
+
+               
+
+                    <li class="nav-item pcoded-hasmenu">
+                        <a href="#!" class="nav-link"><span class="pcoded-micon"><i class="feather icon-box"></i></span><span class="pcoded-mtext">Order</span></a>
+                        <ul class="pcoded-submenu">
+                            <li class=""><a asp-controller="DataDauVaos" asp-action="ReadEmail" class="">Read Email</a></li>
+                        </ul>
+                        <ul class="pcoded-submenu">
+                            <li class=""><a asp-controller="DataDauVaos" asp-action="ListOrder" class="">List Order</a></li>
+                        </ul>
+                        <ul class="pcoded-submenu">
+                            <li class=""><a asp-controller="DataDauVaos" asp-action="Create" class="">Create</a></li>
+                        </ul>
+                        <ul class="pcoded-submenu">
+                            <li class=""><a asp-controller="DataDauVaos" asp-action="TotalItem" class="">Total Item</a></li>
+                        </ul>
+                    </li>
+
+                    @if (User.Identity.IsAuthenticated && User.IsInRole("Admin")) { 
+                        <li class="nav-item">
+                            <a asp-controller="Administration" asp-action="ListRole" class="nav-link"><span class="pcoded-micon"><i class="feather icon-settings"></i></span><span class="pcoded-mtext">List Role</span></a>
+                        </li>
+                    }
+                    @*</li>*@
+                </ul>
+
+
+            </div>
+        </div>
+    </nav>
+    <!-- [ navigation menu ] end -->
+    <!-- [ Header ] start -->
+    <header class="navbar pcoded-header navbar-expand-lg navbar-light headerpos-fixed">
+        <div class="m-header">
+            <a class="mobile-menu" id="mobile-collapse1" href="#!"><span></span></a>
+            <a href="index.html" class="b-brand">
+                <img src="~/images/logo.svg" alt="" class="logo images">
+                <img src="~/images/logo-icon.svg" alt="" class="logo-thumb images">
+            </a>
+        </div>
+        <a class="mobile-menu" id="mobile-header" href="#!">
+            <i class="feather icon-more-horizontal"></i>
+        </a>
+        <div class="collapse navbar-collapse">
+            <a href="#!" class="mob-toggler"></a>
+            @*<ul class="navbar-nav mr-auto">
+                    <li class="nav-item">
+                        <div class="main-search open">
+                            <div class="input-group">
+                                <input type="text" id="m-search" class="form-control" placeholder="Search . . .">
+                                <a href="#!" class="input-group-append search-close">
+                                    <i class="feather icon-x input-group-text"></i>
+                                </a>
+                                <span class="input-group-append search-btn btn btn-primary">
+                                    <i class="feather icon-search input-group-text"></i>
+                                </span>
+                            </div>
+                        </div>
+                    </li>
+                </ul>*@
+            <ul class="navbar-nav ml-auto">
+                <li>
+                    <div class="dropdown drp-user">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                            <i class="icon feather icon-settings"></i>
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-right profile-notification">
+                            @if (SignInManager.IsSignedIn(User))
+                            {
+                                <div class="pro-head">
+                                    <img src="~/images/user/avatar-1.jpg" class="img-radius" alt="User-Profile-Image">
+                                    <span>@UserManager.GetUserName(User)</span>
+                                    <a asp-controller="Account" asp-action="Logout" class="dud-logout" title="Logout">
+                                        <i class="feather icon-log-out"></i>
+                                    </a>
+                                </div>
+                                <ul class="pro-body">
+                                    <li><a href="#!" class="dropdown-item"><i class="feather icon-settings"></i> Settings</a></li>
+                                    <li><a href="#!" class="dropdown-item"><i class="feather icon-user"></i> Profile</a></li>
+                                    <li><a href="message.html" class="dropdown-item"><i class="feather icon-mail"></i> My Messages</a></li>
+                                    <li><a href="auth-signin.html" class="dropdown-item"><i class="feather icon-lock"></i> Lock Screen</a></li>
+                                </ul>
+                            }
+                        </div>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </header>
+    <!-- [ Header ] end -->
+    @*<header>
+
+            <nav class="navbar navbar-icon-top navbar-expand-lg navbar-dark bg-dark fixed-top">
+                <a class="navbar-brand" asp-controller="Home" asp-action="Index"></a>
+                <button class="navbar-toggler" type="button"
+                        data-toggle="collapse"
+                        data-target="#navbarSupportedContent"
+                        aria-controls="navbarSupportedContent"
+                        aria-expanded="false"
+                        aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                    <ul class="navbar-nav mr-auto">
+                        <li class="nav-item active">
+                            <a class="nav-link" asp-controller="Home" asp-action="Index">
+                                <i class="fa fa-home"></i>
+                                Home
+                                <span class="sr-only">(current)</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-route-reset="abc" asp-controller="DataDauVaos" asp-action="Create">
+                                <i class="fa fa-building">
+                                </i>
+                                Phân tích
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" data-toggle="modal" data-target="#exampleModalCenter2">
+                                <i class="fa fa-building">
+                                </i>
+                                Lưu trữ
+                            </a>
+                        </li>
+
+
+
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <i class="fa fa-superscript">
+
+                                </i>
+                                Thuật Toán
+                            </a>
+                            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                <a class="dropdown-item" asp-controller="ThuatToans" asp-action="Create">Thêm thuật toán</a>
+                                <a class="dropdown-item" asp-controller="ThuatToans" asp-action="Index">Danh sách</a>
+
+                            </div>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <i class="fa fa-hand-paper-o    ">
+                                </i>
+                                Cấp Quyền
+                            </a>
+                            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                <a class="dropdown-item" href="#">Thêm User</a>
+                                <a class="dropdown-item" href="/Administration/EditUserInRole?roleId=79aab6f5-f407-4410-a4d1-c574132ba866">Phân quyền user</a>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+        </header>*@
+
+    <!-- [ Main Content ] start -->
+    <div class="pcoded-main-container">
+        <div class="pcoded-wrapper">
+            <div class="pcoded-content">
+                <div class="pcoded-inner-content">
+                    <div class="main-body">
+                        <div class="page-wrapper">
+                            <!-- [ breadcrumb ] start -->
+                            <div class="page-header">
+                                <div class="page-block">
+                                    <div class="row align-items-center">
+                                        <div class="col-md-12">
+                                            <div class="page-header-title">
+                                                <h5>Home</h5>
+                                            </div>
+                                            <ul class="breadcrumb">
+                                                <li class="breadcrumb-item"><a href="index.html"><i class="feather icon-home"></i></a></li>
+                                                <li class="breadcrumb-item"><a href="#!">Analytics Dashboard</a></li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- [ breadcrumb ] end -->
+                            <!-- [ Main Content ] start -->
+                            <partial name="_CookieConsentPartial" />
+                            @RenderBody()
+                            <!-- [ Main Content ] end -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- [ Main Content ] end -->
+    @*<footer class="border-top footer text-muted" onload="showhide123()">
+            <div class="container">
+                &copy; 2020 - WebDeApplication - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+            </div>
+        </footer>*@
+
+    @*<script src="~/lib/jquery/dist/jquery.js"></script>*@
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.js"></script>
+    <!-- Required Js -->
+    @*<script src="~/lib/bootstrap/dist/js/bootstrap.min.js"></script>*@
+    @*<script src="~/js/vendor-all.min.js"></script>*@
+    @*<script src="~/js/pcoded.min.js"></script>*@
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"
+            asp-fallback-src="~/lib/jquery/dist/jquery.min.js"
+            asp-fallback-test="window.jQuery"
+            crossorigin="anonymous"
+            integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=">
+    </script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.bundle.min.js"
+            asp-fallback-src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"
+            asp-fallback-test="window.jQuery && window.jQuery.fn && window.jQuery.fn.modal"
+            crossorigin="anonymous"
+            integrity="sha384-xrRywqdh3PHs8keKZN+8zzc5TX0GRTLCcmivcbNJWm2rs5C8PRhcEn3czEjhAO9o">
+    </script>
+    <script src="~/js/vendor-all.min.js"></script>
+    <script src="~/js/pcoded.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.min.js"></script>
+
+
+
+    @*<script src="~/js/pages/dashboard-analytics.js"></script>*@
+
+    @*<script src="~/js/site.js" asp-append-version="true"></script>*@
+
+    @*<script type="text/javascript">
+            $(document).ready(function () {
+                $('#datepicker').datetimepicker({ dateFormat: 'dd/mm/yy' });
+            });
+
+        </script>*@
+    @RenderSection("Scripts", required: false)
+</body>
+</html>

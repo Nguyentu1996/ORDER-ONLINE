@@ -1,0 +1,257 @@
+﻿@*@model WebDeApplication.Models.Item*@
+@namespace WebDeApplication.Models.Dto
+@{
+//ViewData["Total Item"] = "";
+}
+<div class="col-12">
+    <div class="card">
+        <div class="card-header" id="headingOne">
+            <h5 class="mb-0">Search</h5>
+        </div>
+        <div id="collapseOne" class=" card-body collapse show" aria-labelledby="headingOne" data-parent="#search">
+            @*<div class="row">
+            <div class="col-md-12">
+                <form class="form-inline  w-100" asp-action="ReadEmailAction" method="post">
+                    <div class="col-md-6 px-0">
+                        <div class="form-group mb-2">
+                            <label style="min-width:80px">From Date: &nbsp;</label>
+                            <input type="text" name="from" class="form-control w-75" placeholder="10/10/2021 . . ." autocomplete="off">
+                        </div>
+
+                    </div>
+                    <div class="col-md-6 px-0">
+                        <div class="form-group mb-2 justify-content-end">
+                            <label style="min-width:80px">To Date: &nbsp;</label>
+                            <input type="text" name="to" class="form-control w-75" placeholder="20/10/2021. . ." autocomplete="off">
+                        </div>
+                    </div>
+                    <div class="col-md-6 px-0">
+                        <div class="form-group mb-2">
+                            <label style="min-width:80px">Code: &nbsp;</label>
+                            <input type="text" id="m-search" name="code" class="form-control w-75" placeholder="Code . . ." autocomplete="off">
+                        </div>
+
+                    </div>
+                    <div class="col-md-6 px-0">
+                        <div class="form-group mb-2 justify-content-end">
+                            <label style="min-width:80px">Limit: &nbsp;</label>
+                            <input type="number" name="limit" class="form-control w-75" placeholder="Limit . . ." autocomplete="off">
+                        </div>
+                    </div>
+                    <div class="col-md-12 d-flex justify-content-end px-0 mx-0">
+                        <button type="submit" id="btn-readEmail" class="btn btn-primary mx-0">Read Email</button>
+                    </div>
+
+                </form>
+            </div>
+        </div>*@
+            <div class="row">
+                <div class="col-md-12">
+                    <form class="form-inline  w-100" asp-action="TotalItem" method="get">
+                        <div class="col-6 px-0">
+                            <div class="form-group mb-2">
+                                <label style="width:80px">Item Name: &nbsp;</label>
+                                <input type="text" id="m-search" name="name" value="@Context.Request.Query["name"].ToString()" class="form-control w-75" autocomplete="off">
+                            </div>
+                            <!--<div class="form-group mb-2">
+                                <label style="width:80px">Date: &nbsp;</label>
+                                <input name="date" class="form-control w-75" type="date" value="@Context.Request.Query["date"].ToString()" pattern="\d{4}-\d{2}-\d{2}" id="datepicker" autocomplete="off">-->
+                                @*@Html.TextBox("txtJoiningDate", Model.JoiningDate.Value, "{0:yyyy-MM-dd}", new { @style = "width:100%", type = "date" })*@
+
+                            <!--</div>-->
+                        </div>
+                        <div class="col-6">
+                            <div class="form-group mb-2">
+                                <label style="width:80px">Date To: &nbsp;</label>
+                                <input name="from" class="form-control w-75" type="date" value="@Context.Request.Query["from"].ToString()" pattern="\d{4}-\d{2}-\d{2}" id="datepicker" autocomplete="off">
+                            </div>
+                            <div class="form-group mb-2">
+                                <label style="width:80px">Date From: &nbsp;</label>
+                                <input name="to" class="form-control w-75" type="date" value="@Context.Request.Query["to"].ToString()" pattern="\d{4}-\d{2}-\d{2}" id="datepicker" autocomplete="off">
+                            </div>
+                            @*<div class="form-group mb-2">
+                                <label style="width:80px">From: &nbsp;</label>
+                                <input name="from" class="form-control w-75" value="@Context.Request.Query["from"].ToString()" type="time" autocomplete="off">
+                            </div>
+                            <div class="form-group mb-2">
+                                <label style="width:80px">To: &nbsp;</label>
+                                <input name="to" class="form-control w-75" type="time" value="@Context.Request.Query["to"].ToString()" autocomplete="off">
+                            </div>*@
+                        </div>
+                        @*<div class="col-6">
+
+                            <div class="form-group mb-2">
+                                <label style="width:80px">From: &nbsp;</label>
+                                <input name="Address" class="form-control w-75" type="text" autocomplete="off">
+                            </div>                           
+                        </div>*@
+
+                        <button type="submit" id="btn-readEmail" class="btn btn-primary mb-2">Search</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+<div class="col-xl-12 col-md-12">
+    <div class="card table-card">
+        <div class="card-header">
+            <h5 class="mb-0">List data</h5>
+            @*<div class="card-header-right">
+                    <form asp-action="Import" method="post" enctype="multipart/form-data">
+                        <input type="file" name="postedFile" id="fileupload" />
+                        <button type="submit" class="btn btn-primary mb-2" id="btnupload">Import</button>
+                        <a style="float:right" class="btn btn-primary mb-2" asp-action="Create">Create</a>
+                    </form>
+                </div>*@
+        </div>
+        <div class="card-body px-0 py-0">
+            <div class="table-responsive">
+                <div class="session-scroll" style="position:relative;">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+
+                                <th>
+                                    Name
+                                </th>
+                                <th>
+                                    Item
+                                </th>
+                                <th>
+                                    Address
+                                </th>
+                                <th>
+                                    Total
+                                </th>
+
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in ViewData["TotalItem"] as List<TotalItem>)
+                            {
+
+                            <tr>
+                                <td style="max-width:400px; overflow:hidden" data-toggle="tooltip" data-placement="top" title="@item.Name">
+                                    <a class="pointer-events">
+                                        @Html.DisplayFor(modelItem => item.Name)
+                                    </a>
+                                </td>
+                                <td>
+                                    @if (item.ItemCd != null)
+                                    {
+                                        @Html.DisplayFor(modelItem => item.ItemCd)
+                                    }
+                                    else
+                                    {
+                                        <p>---</p>
+                                    }
+                                </td>
+                                <td style="max-width:200px; overflow:hidden" data-toggle="tooltip" data-placement="top" title="@item.Address">
+                                    @Html.DisplayFor(modelItem => item.Address)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.Total)
+                                </td>
+
+                            </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <nav aria-label="Page navigation example">
+                <ul class="pagination justify-content-end px-3 mt-3">
+                    <li style="display:flex;align-items:center">
+                        <p class="m-0 mx-3">Total @ViewBag.totalData</p>
+                    </li>
+                    @{
+                        int numberPage = ViewBag.numberPage;
+                        int pageCurrent = ViewBag.pageCurrent;
+                        int offset = 2;//number display page
+
+
+                        //config FirstLink
+                        if (pageCurrent > 1)
+                        {
+                            int prevPage = pageCurrent - 1;
+                            var PrevLink = new Dictionary<string, string> {
+                                            { "name", Context.Request.Query["name"].ToString()},
+                                            { "from", Context.Request.Query["from"].ToString()},
+                                            { "to", Context.Request.Query["to"].ToString()},
+                                            //{ "date", Context.Request.Query["date"].ToString()},
+                                            { "page", prevPage.ToString() }
+                                        };
+                            <li class="page-item"><a asp-controller="DataDauVaos" asp-action="TotalItem" asp-all-route-data="PrevLink" class="page-link">Prev Link</a></li>
+                        }
+
+                        int from = pageCurrent - offset;
+                        int to = pageCurrent + offset;
+                        if (from <= 0)
+                        {
+                            from = 1;
+                            to = offset * 2;
+                        }
+
+
+                        if (to > numberPage)
+                        {
+                            to = numberPage;
+                        }
+
+                        int x;
+                        for (x = from; x <= to; x++)
+                        {
+                            var parms = new Dictionary<string, string> {
+                                            { "name", Context.Request.Query["name"].ToString()},
+                                            { "from", Context.Request.Query["from"].ToString()},
+                                            { "to", Context.Request.Query["to"].ToString()},
+                                            //{ "date", Context.Request.Query["date"].ToString()},
+                                            { "page",x.ToString() }
+                            };
+                            if (pageCurrent == x)
+                            {
+                                <li class="page-item active"><a asp-controller="DataDauVaos" asp-action="TotalItem" asp-all-route-data="parms" class="page-link">@x</a></li>
+                            }
+                            else
+                            {
+                                <li class="page-item"><a asp-controller="DataDauVaos" asp-action="TotalItem" asp-all-route-data="parms" class="page-link">@x</a></li>
+                            }
+
+                        }
+
+                        if (pageCurrent < numberPage - (to / 2))
+                        {
+                            <li class="page-item"><a class="page-link">...</a></li>
+                            var LastLink = new Dictionary<string, string> {
+                                             { "page",numberPage.ToString() },
+                                             { "name", Context.Request.Query["name"].ToString()},
+                                            { "from", Context.Request.Query["from"].ToString()},
+                                            { "to", Context.Request.Query["to"].ToString()},
+                                            //{ "date", Context.Request.Query["date"].ToString()},
+
+                            };
+                            <li class="page-item"><a asp-controller="DataDauVaos" asp-action="TotalItem" asp-all-route-data="LastLink" class="page-link">Last Link</a></li>
+                        }
+
+                        if (pageCurrent < numberPage)
+                        {
+                            int nextPage = pageCurrent + 1;
+                            var NextLink = new Dictionary<string, string> {
+                                             { "page",nextPage.ToString() },
+                                             { "name", Context.Request.Query["name"].ToString()},
+                                            { "from", Context.Request.Query["from"].ToString()},
+                                            { "to", Context.Request.Query["to"].ToString()},
+                                            //{ "date", Context.Request.Query["date"].ToString()},
+
+                            };
+                            <li class="page-item"><a asp-controller="DataDauVaos" asp-action="TotalItem" asp-all-route-data="NextLink" class="page-link">Next Link</a></li>
+                        }
+                    }
+                </ul>
+            </nav>
+
+        </div>
+    </div>
+</div>

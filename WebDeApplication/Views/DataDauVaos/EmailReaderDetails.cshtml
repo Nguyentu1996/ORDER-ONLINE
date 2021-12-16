@@ -1,0 +1,172 @@
+﻿@model WebDeApplication.Models.EmailReader
+
+@{
+    ViewData["Title"] = "EmailReaderDetails";
+}
+
+<div class="row">
+    <!-- [ form-element ] start -->
+    <div class="col-sm-12">
+        <div class="card">
+            <div class="card-header">
+                <h5>Details data</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <form asp-action="EditEmail" class="row" style="width:100%">
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label asp-for="ODNumber" class="control-label"></label>
+                                <input asp-for="ODNumber" class="form-control datepicker" id="datepicker" readonly />
+                                <span asp-validation-for="ODNumber" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="name" class="control-label"></label>
+                                <input asp-for="name" class="form-control" readonly />
+                                <span asp-validation-for="name" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="toAddress" class="control-label"></label>
+                                <input asp-for="toAddress" class="form-control" readonly />
+                                <span asp-validation-for="toAddress" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="fromAddress" class="control-label"></label>
+                                <input asp-for="fromAddress" class="form-control" readonly />
+                                <span asp-validation-for="fromAddress" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="tracking" class="control-label"></label>
+                                <input asp-for="tracking" class="form-control" readonly />
+                                <span asp-validation-for="tracking" class="text-danger"></span>
+                            </div>
+                            <input type="hidden" asp-for="Id" />
+                            <button type="submit" class="btn btn-primary">Submit</button>
+                            <a href="javascript:history.go(-1)" class="btn btn-primary">Back</a>
+                        </div>
+                        <div class="col-md-3">
+
+                            <div class="form-group">
+                                <label asp-for="receivedTime" class="control-label"></label>
+                                <input asp-for="receivedTime" class="form-control" readonly />
+                                <span asp-validation-for="receivedTime" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="status" class="control-label"></label>
+                                <input asp-for="status" class="form-control" readonly />
+                                <span asp-validation-for="status" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="address" class="control-label"></label>
+                                <input asp-for="address" class="form-control" readonly />
+                                <span asp-validation-for="address" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="shippto" class="control-label"></label>
+                                <input asp-for="shippto" class="form-control" readonly />
+                                <span asp-validation-for="shippto" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="orderTotal" class="control-label"></label>
+                                <input asp-for="orderTotal" class="form-control" readonly />
+                                <span asp-validation-for="orderTotal" class="text-danger"></span>
+                            </div>
+
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label asp-for="subject" class="control-label"></label>
+                                <input asp-for="subject" class="form-control" readonly />
+                                <span asp-validation-for="subject" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="summary" class="control-label"></label>
+                                <textarea readonly asp-for="summary" class="form-control" id="exampleFormControlTextarea1" rows="7"></textarea>
+
+                                <span asp-validation-for="summary" class="text-danger"></span>
+                            </div>
+                            <div class="d-flex align-content-center" style="height:40px">
+
+                                <div class="form-check px-0">
+                                    @Html.CheckBoxFor(model => model.shipped)
+
+                                    <label class="form-check-label" asp-for="shipped">
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- [ form-element ] end -->
+</div>
+
+<!-- [ form-element ] end -->
+@*<div class="col-xl-12 col-md-12">*@
+    <div class="card table-card">
+        <div class="card-header">
+            <h5 class="mb-0">List Item</h5>
+        </div>
+        <div class="card-body px-0 py-0">
+            <div class="table-responsive">
+                <div class="session-scroll" style="position:relative;">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>                          
+                                <th>
+                                    Name
+                                </th>
+                                @*<th>
+                                    ItemCd
+                                </th>*@
+                                <th>
+                                    Price
+                                </th>
+                                <th>
+                                    Quantity
+                                </th>
+                                <th>
+
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in ViewData["ItemList"] as List<Item>)
+                            {
+
+                                <tr id="tr_@item.Id">
+                                    <td>
+                                        @*onclick="location.href = '@(Url.Action("EmailReaderDetails", "DataDauVaos", new { id = item.Id }))'"*@
+                                        <a class="pointer-events">
+                                            @Html.DisplayFor(modelItem => item.Name)
+                                        </a>
+                                    </td>
+                                    @*<td>
+                                        @Html.DisplayFor(modelItem => item.ItemCd)
+                                    </td>*@
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.Price)
+                                    </td>                          
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.Quantity)
+                                    </td>                            
+                                    <td>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+
+        </div>
+    </div>
+@*</div>*@
+
+
+
+
+
