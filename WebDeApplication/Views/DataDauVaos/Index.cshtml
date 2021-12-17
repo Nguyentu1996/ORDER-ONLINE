@@ -5,608 +5,389 @@
 }
 
 
-
-
 <div class="row">
+    <div id="divPrint"></div>
+</div>
+<div class="rows">
+    <div class="col-sm-12">
+        <div class="accordion" id="accordionExample">
+            <div class="card">
+                <div class="card-header" id="headingOne">
+                    <h5 class="mb-0">Search</h5>
+                </div>
+                <div id="collapseOne" class=" card-body collapse show" aria-labelledby="headingOne" data-parent="#search">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <form class="form-inline" asp-action="Index" method="get">
+                                <div class="form-group mb-2">
+                                    <label>Day: &nbsp;</label>
+                                    <select class="form-control" id="Day" name="Day">
+                                        <option value=""> - - - All</option>
+                                        @for (int i = 1; i <= 31; i++)
+                                        {
+                                            string day = Context.Request.Query["Day"].ToString();
+                                            @if (i < 10)
+                                            {
+                                                string value = "0" + @i + "";
+                                                if (day == value)
+                                                {
+                                                    <option value="@value" selected>@value</option>
+                                                }
+                                                <option value="@value">@value</option>
+                                            }
+                                            else
+                                            {
+                                                string value = "" + @i + "";
+                                                if (day == value)
+                                                {
+                                                    <option value="@value" selected>@value</option>
+                                                }
+                                                <option value="@value">@value</option>
+                                            }
+                                        }
+                                    </select>
+                                </div>
+                                <div class="form-group mx-sm-3 mb-2">
+                                    <label>Month: &nbsp;</label>
+                                    <select class="form-control" id="Month" name="Month">
+                                        <option value=""> - - - All</option>
+                                        @for (int i = 1; i <= 12; i++)
+                                        {
+                                            string month = Context.Request.Query["Month"].ToString();
+                                            @if (i < 10)
+                                            {
+                                                string value = "0" + @i + "";
+                                                if (month == value)
+                                                {
+                                                    <option value="@value" selected>@value</option>
+                                                }
+                                                <option value="@value">@value</option>
+                                            }
+                                            else
+                                            {
+                                                string value = "" + @i + "";
+                                                if (month == value)
+                                                {
+                                                    <option value="@value" selected>@value</option>
+                                                }
+                                                <option value="@value">@value</option>
+                                            }
+                                        }
+                                    </select>
+                                </div>
+                                <div class="form-group mx-sm-3 mb-2">
+                                    <label>Year: &nbsp;</label>
+                                    <select class="form-control" id="Year" name="Year">
+                                        <option value=""> - - - All</option>
+                                        @for (int i = 1999; i <= 2025; i++)
+                                        {
+                                            string month = Context.Request.Query["Year"].ToString();
+                                            string value = "" + @i + "";
+                                            if (month == value)
+                                            {
+                                                <option value="@value" selected>@value</option>
+                                            }
+                                            <option value="@value">@value</option>
+                                        }
+                                    </select>
+                                </div>
+                                <button type="submit" class="btn btn-primary mb-2">Search</button>
 
-    <!-- product profit start -->
-    <div class="col-xl-3 col-md-6">
-        <div class="card prod-p-card bg-c-red">
-            <div class="card-body">
-                <div class="row align-items-center m-b-25">
-                    <div class="col">
-                        <h6 class="m-b-5 text-white">Total Profit</h6>
-                        <h3 class="m-b-0 text-white">$1,783</h3>
-                    </div>
-                    <div class="col-auto">
-                        <i class="fas fa-money-bill-alt text-c-red f-18"></i>
-                    </div>
-                </div>
-                <p class="m-b-0 text-white"><span class="label label-danger m-r-10">+11%</span>From Previous Month</p>
-            </div>
-        </div>
-    </div>
-    <div class="col-xl-3 col-md-6">
-        <div class="card prod-p-card bg-c-blue">
-            <div class="card-body">
-                <div class="row align-items-center m-b-25">
-                    <div class="col">
-                        <h6 class="m-b-5 text-white">Total Orders</h6>
-                        <h3 class="m-b-0 text-white">15,830</h3>
-                    </div>
-                    <div class="col-auto">
-                        <i class="fas fa-database text-c-blue f-18"></i>
-                    </div>
-                </div>
-                <p class="m-b-0 text-white"><span class="label label-primary m-r-10">+12%</span>From Previous Month</p>
-            </div>
-        </div>
-    </div>
-    <div class="col-xl-3 col-md-6">
-        <div class="card prod-p-card bg-c-green">
-            <div class="card-body">
-                <div class="row align-items-center m-b-25">
-                    <div class="col">
-                        <h6 class="m-b-5 text-white">Average Price</h6>
-                        <h3 class="m-b-0 text-white">$6,780</h3>
-                    </div>
-                    <div class="col-auto">
-                        <i class="fas fa-dollar-sign text-c-green f-18"></i>
-                    </div>
-                </div>
-                <p class="m-b-0 text-white"><span class="label label-success m-r-10">+52%</span>From Previous Month</p>
-            </div>
-        </div>
-    </div>
-    <div class="col-xl-3 col-md-6">
-        <div class="card prod-p-card bg-c-yellow">
-            <div class="card-body">
-                <div class="row align-items-center m-b-25">
-                    <div class="col">
-                        <h6 class="m-b-5 text-white">Product Sold</h6>
-                        <h3 class="m-b-0 text-white">6,784</h3>
-                    </div>
-                    <div class="col-auto">
-                        <i class="fas fa-tags text-c-yellow f-18"></i>
-                    </div>
-                </div>
-                <p class="m-b-0 text-white"><span class="label label-warning m-r-10">+52%</span>From Previous Month</p>
-            </div>
-        </div>
-    </div>
-    <!-- product profit end -->
-    <div class="col-md-12 col-xl-4">
-        <div class="card card-social">
-            <div class="card-block border-bottom">
-                <div class="row align-items-center justify-content-center">
-                    <div class="col-auto">
-                        @*<i class="fab fa-facebook-f text-primary f-36"></i>*@
-                        <img  src="~/images/browser/sephora.png" style="height: 50px; width:auto"/>
-                    </div>
-                    <div class="col text-right">
-                        <h3>12,281</h3>
-                        <h5 class="text-c-blue mb-0">+7.2% <span class="text-muted">Total Likes</span></h5>
-                    </div>
-                </div>
-            </div>
-            <div class="card-block">
-                <div class="row align-items-center justify-content-center card-active">
-                    <div class="col-6">
-                        <h6 class="text-center m-b-10"><span class="text-muted m-r-5">Target:</span>35,098</h6>
-                        <div class="progress">
-                            <div class="progress-bar progress-c-blue" role="progressbar" style="width:60%;height:6px;" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100"></div>
-                        </div>
-                    </div>
-                    <div class="col-6">
-                        <h6 class="text-center  m-b-10"><span class="text-muted m-r-5">Duration:</span>350</h6>
-                        <div class="progress">
-                            <div class="progress-bar progress-c-green" role="progressbar" style="width:45%;height:6px;" aria-valuenow="45" aria-valuemin="0" aria-valuemax="100"></div>
+                            </form>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-    <div class="col-md-6 col-xl-4">
-        <div class="card card-social">
-            <div class="card-block border-bottom">
-                <div class="row align-items-center justify-content-center">
-                    <div class="col-auto">
-                        <i class="fab fa-twitter text-c-info f-36"></i>
-                    </div>
-                    <div class="col text-right">
-                        <h3>11,200</h3>
-                        <h5 class="text-c-info mb-0">+6.2% <span class="text-muted">Total Likes</span></h5>
-                    </div>
-                </div>
-            </div>
-            <div class="card-block">
-                <div class="row align-items-center justify-content-center card-active">
-                    <div class="col-6">
-                        <h6 class="text-center m-b-10"><span class="text-muted m-r-5">Target:</span>34,185</h6>
-                        <div class="progress">
-                            <div class="progress-bar progress-c-blue" role="progressbar" style="width:40%;height:6px;" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100"></div>
-                        </div>
-                    </div>
-                    <div class="col-6">
-                        <h6 class="text-center  m-b-10"><span class="text-muted m-r-5">Duration:</span>800</h6>
-                        <div class="progress">
-                            <div class="progress-bar progress-c-green" role="progressbar" style="width:70%;height:6px;" aria-valuenow="70" aria-valuemin="0" aria-valuemax="100"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-6 col-xl-4">
-        <div class="card card-social">
-            <div class="card-block border-bottom">
-                <div class="row align-items-center justify-content-center">
-                    <div class="col-auto">
-                        <i class="fab fa-google-plus-g text-c-red f-36"></i>
-                    </div>
-                    <div class="col text-right">
-                        <h3>10,500</h3>
-                        <h5 class="text-c-red mb-0">+5.9% <span class="text-muted">Total Likes</span></h5>
-                    </div>
-                </div>
-            </div>
-            <div class="card-block">
-                <div class="row align-items-center justify-content-center card-active">
-                    <div class="col-6">
-                        <h6 class="text-center m-b-10"><span class="text-muted m-r-5">Target:</span>25,998</h6>
-                        <div class="progress">
-                            <div class="progress-bar progress-c-blue" role="progressbar" style="width:80%;height:6px;" aria-valuenow="80" aria-valuemin="0" aria-valuemax="100"></div>
-                        </div>
-                    </div>
-                    <div class="col-6">
-                        <h6 class="text-center  m-b-10"><span class="text-muted m-r-5">Duration:</span>900</h6>
-                        <div class="progress">
-                            <div class="progress-bar progress-c-green" role="progressbar" style="width:50%;height:6px;" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <!-- sessions-section start -->
-    <div class="col-md-12">
+    <div class="col-xl-12 col-md-12">
         <div class="card table-card">
             <div class="card-header">
-                <h5>Site visitors session log</h5>
+                <h5 class="mb-0">List data</h5>
+                <div class="card-header-right">
+                    <form asp-action="Import" method="post" enctype="multipart/form-data">
+                        <input type="file" name="postedFile" id="fileupload" />
+                        <button type="submit" class="btn btn-primary mb-2" id="btnupload">Import</button>
+                        <a style="float:right" class="btn btn-primary mb-2" asp-action="Create">Create</a>
+                    </form>
+                </div>
             </div>
             <div class="card-body px-0 py-0">
                 <div class="table-responsive">
-                    <div class="session-scroll" style="height:478px;position:relative;">
-                        <table class="table table-hover m-b-0">
+                    <div class="session-scroll" style="position:relative;">
+                        <table class="table table-striped">
                             <thead>
                                 <tr>
-                                    <th><span>CAMPAIGN DATE</span></th>
-                                    <th><span>CLICK <a class="help" data-toggle="popover" title="" data-content="And here's some amazing content. It's very engaging. Right?" data-original-title="Popover title"><i class="feather icon-help-circle f-16"></i></a></span></th>
-                                    <th><span>COST <a class="help" data-toggle="popover" title="" data-content="And here's some amazing content. It's very engaging. Right?" data-original-title="Popover title"><i class="feather icon-help-circle f-16"></i></a></span></th>
-                                    <th><span>CTR <a class="help" data-toggle="popover" title="" data-content="And here's some amazing content. It's very engaging. Right?" data-original-title="Popover title"><i class="feather icon-help-circle f-16"></i></a></span></th>
-                                    <th><span>ARPU <a class="help" data-toggle="popover" title="" data-content="And here's some amazing content. It's very engaging. Right?" data-original-title="Popover title"><i class="feather icon-help-circle f-16"></i></a></span></th>
-                                    <th><span>ECPI <a class="help" data-toggle="popover" title="" data-content="And here's some amazing content. It's very engaging. Right?" data-original-title="Popover title"><i class="feather icon-help-circle f-16"></i></a></span></th>
-                                    <th><span>ROI <a class="help" data-toggle="popover" title="" data-content="And here's some amazing content. It's very engaging. Right?" data-original-title="Popover title"><i class="feather icon-help-circle f-16"></i></a></span></th>
-                                    <th><span>REVENUE <a class="help" data-toggle="popover" title="" data-content="And here's some amazing content. It's very engaging. Right?" data-original-title="Popover title"><i class="feather icon-help-circle f-16"></i></a></span></th>
-                                    <th><span>CONVERSIONS <a class="help" data-toggle="popover" title="" data-content="And here's some amazing content. It's very engaging. Right?" data-original-title="Popover title"><i class="feather icon-help-circle f-16"></i></a></span></th>
+                                    <th>
+                                        @Html.DisplayNameFor(model => model.ODNumber)
+                                    </th>
+                                    <th>
+                                        @Html.DisplayNameFor(model => model.Name)
+                                    </th>
+                                    <th>
+                                        @Html.DisplayNameFor(model => model.Adress)
+                                    </th>
+                                    <th>
+                                        @Html.DisplayNameFor(model => model.NgayGui)
+                                    </th>
+                                    <th>
+                                        @Html.DisplayNameFor(model => model.MaSP)
+                                    </th>
+                                    <th>
+                                        @Html.DisplayNameFor(model => model.LinkSanPham)
+                                    </th>
+                                    <th>
+                                        @Html.DisplayNameFor(model => model.Mau)
+                                    </th>
+                                    <th>
+                                        @Html.DisplayNameFor(model => model.Size)
+                                    </th>
+                                    <th>
+                                        @Html.DisplayNameFor(model => model.CanMua)
+                                    </th>
+                                    <th>
+                                        @Html.DisplayNameFor(model => model.DaMua)
+                                    </th>
+                                    <th>
+                                        @Html.DisplayNameFor(model => model.GiaUSD)
+                                    </th>
+                                    <th>
+                                        @Html.DisplayNameFor(model => model.GiaSale)
+                                    </th>
+                                    <th>
+                                        @Html.DisplayNameFor(model => model.ShipOrTax)
+                                    </th>
+                                    <th>
+                                        @Html.DisplayNameFor(model => model.TongVND)
+                                    </th>
+                                    <th>
+                                        @Html.DisplayNameFor(model => model.Debt)
+                                    </th>
+                                  
+                                    <th>
+                                        @Html.DisplayNameFor(model => model.GhiChu)
+                                    </th>
+                                    <th>
+                                        @Html.DisplayNameFor(model => model.ItemInTrack)
+                                    </th>
+                                    <th>
+                                        @Html.DisplayNameFor(model => model.LinkTrack)
+                                    </th>
+
+                                    <th>
+                                        @Html.DisplayNameFor(model => model.Payment)
+                                    </th>
+                                    <th>
+                                        @Html.DisplayNameFor(model => model.Rate)
+                                    </th>
+                                    <th>
+                                        @Html.DisplayNameFor(model => model.Status)
+                                    </th>
+                                    <th>
+                                        @Html.DisplayNameFor(model => model.TongVND)
+                                    </th>
+                                    @*<th>
+                                            @Html.DisplayNameFor(model => model.Address)
+                                        </th>
+                                        <th>
+                                            @Html.DisplayNameFor(model => model.Name)
+                                        </th>
+                                        <th>
+                                            @Html.DisplayNameFor(model => model.Shippto)
+                                        </th>*@
+                                    <th>
+
+                                    </th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>
-                                    <td>Total and average</td>
-                                    <td>1300</td>
-                                    <td>1025</td>
-                                    <td>14005</td>
-                                    <td>95,3%</td>
-                                    <td>29,7%</td>
-                                    <td>3,25</td>
-                                    <td>2:30</td>
-                                    <td>45.5%</td>
-                                </tr>
-                                <tr>
-                                    <td>8-11-2016</td>
-                                    <td>
-                                        786
-                                        <div class="progress mt-1" style="height:4px;">
-                                            <div class="progress-bar bg-danger rounded" role="progressbar" style="width: 60%;" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100"></div>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        485
-                                        <div class="progress mt-1" style="height:4px;">
-                                            <div class="progress-bar bg-primary rounded" role="progressbar" style="width: 50%;" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100"></div>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        769
-                                        <div class="progress mt-1" style="height:4px;">
-                                            <div class="progress-bar bg-warning rounded" role="progressbar" style="width: 70%;" aria-valuenow="70" aria-valuemin="0" aria-valuemax="100"></div>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        45,3%
-                                        <div class="progress mt-1" style="height:4px;">
-                                            <div class="progress-bar bg-success rounded" role="progressbar" style="width: 60%;" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100"></div>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        6,7%
-                                        <div class="progress mt-1" style="height:4px;">
-                                            <div class="progress-bar bg-info rounded" role="progressbar" style="width: 30%;" aria-valuenow="30" aria-valuemin="0" aria-valuemax="100"></div>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        8,56
-                                        <div class="progress mt-1" style="height:4px;">
-                                            <div class="progress-bar bg-danger rounded" role="progressbar" style="width: 40%;" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100"></div>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        10:55
-                                        <div class="progress mt-1" style="height:4px;">
-                                            <div class="progress-bar bg-warning rounded" role="progressbar" style="width: 70%;" aria-valuenow="70" aria-valuemin="0" aria-valuemax="100"></div>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        33.8%
-                                        <div class="progress mt-1" style="height:4px;">
-                                            <div class="progress-bar bg-success rounded" role="progressbar" style="width: 40%;" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100"></div>
-                                        </div>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>15-10-2016</td>
-                                    <td>
-                                        786
-                                        <div class="progress mt-1" style="height:4px;">
-                                            <div class="progress-bar bg-danger rounded" role="progressbar" style="width: 65%;" aria-valuenow="65" aria-valuemin="0" aria-valuemax="100"></div>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        523
-                                        <div class="progress mt-1" style="height:4px;">
-                                            <div class="progress-bar bg-primary rounded" role="progressbar" style="width: 80%;" aria-valuenow="80" aria-valuemin="0" aria-valuemax="100"></div>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        736
-                                        <div class="progress mt-1" style="height:4px;">
-                                            <div class="progress-bar bg-warning rounded" role="progressbar" style="width: 80%;" aria-valuenow="80" aria-valuemin="0" aria-valuemax="100"></div>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        78,3%
-                                        <div class="progress mt-1" style="height:4px;">
-                                            <div class="progress-bar bg-success rounded" role="progressbar" style="width: 70%;" aria-valuenow="70" aria-valuemin="0" aria-valuemax="100"></div>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        6,6%
-                                        <div class="progress mt-1" style="height:4px;">
-                                            <div class="progress-bar bg-info rounded" role="progressbar" style="width: 70%;" aria-valuenow="70" aria-valuemin="0" aria-valuemax="100"></div>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        7,56
-                                        <div class="progress mt-1" style="height:4px;">
-                                            <div class="progress-bar bg-danger rounded" role="progressbar" style="width: 44%;" aria-valuenow="44" aria-valuemin="0" aria-valuemax="100"></div>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        4:30
-                                        <div class="progress mt-1" style="height:4px;">
-                                            <div class="progress-bar bg-warning rounded" role="progressbar" style="width: 68%;" aria-valuenow="68" aria-valuemin="0" aria-valuemax="100"></div>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        76.8%
-                                        <div class="progress mt-1" style="height:4px;">
-                                            <div class="progress-bar bg-success rounded" role="progressbar" style="width: 90%;" aria-valuenow="90" aria-valuemin="0" aria-valuemax="100"></div>
-                                        </div>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>8-8-2017</td>
-                                    <td>
-                                        624
-                                        <div class="progress mt-1" style="height:4px;">
-                                            <div class="progress-bar bg-danger rounded" role="progressbar" style="width: 45%;" aria-valuenow="45" aria-valuemin="0" aria-valuemax="100"></div>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        436
-                                        <div class="progress mt-1" style="height:4px;">
-                                            <div class="progress-bar bg-primary rounded" role="progressbar" style="width: 55%;" aria-valuenow="55" aria-valuemin="0" aria-valuemax="100"></div>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        756
-                                        <div class="progress mt-1" style="height:4px;">
-                                            <div class="progress-bar bg-warning rounded" role="progressbar" style="width: 95%;" aria-valuenow="95" aria-valuemin="0" aria-valuemax="100"></div>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        78,3%
-                                        <div class="progress mt-1" style="height:4px;">
-                                            <div class="progress-bar bg-success rounded" role="progressbar" style="width: 38%;" aria-valuenow="38" aria-valuemin="0" aria-valuemax="100"></div>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        6,4%
-                                        <div class="progress mt-1" style="height:4px;">
-                                            <div class="progress-bar bg-info rounded" role="progressbar" style="width: 30%;" aria-valuenow="30" aria-valuemin="0" aria-valuemax="100"></div>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        9,45
-                                        <div class="progress mt-1" style="height:4px;">
-                                            <div class="progress-bar bg-danger rounded" role="progressbar" style="width: 41%;" aria-valuenow="41" aria-valuemin="0" aria-valuemax="100"></div>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        9:05
-                                        <div class="progress mt-1" style="height:4px;">
-                                            <div class="progress-bar bg-warning rounded" role="progressbar" style="width: 67%;" aria-valuenow="67" aria-valuemin="0" aria-valuemax="100"></div>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        8.63%
-                                        <div class="progress mt-1" style="height:4px;">
-                                            <div class="progress-bar bg-success rounded" role="progressbar" style="width: 41%;" aria-valuenow="41" aria-valuemin="0" aria-valuemax="100"></div>
-                                        </div>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>11-12-2017</td>
-                                    <td>
-                                        423
-                                        <div class="progress mt-1" style="height:4px;">
-                                            <div class="progress-bar bg-danger rounded" role="progressbar" style="width: 54%;" aria-valuenow="54" aria-valuemin="0" aria-valuemax="100"></div>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        123
-                                        <div class="progress mt-1" style="height:4px;">
-                                            <div class="progress-bar bg-primary rounded" role="progressbar" style="width: 70%;" aria-valuenow="70" aria-valuemin="0" aria-valuemax="100"></div>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        756
-                                        <div class="progress mt-1" style="height:4px;">
-                                            <div class="progress-bar bg-warning rounded" role="progressbar" style="width: 75%;" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100"></div>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        78,6%
-                                        <div class="progress mt-1" style="height:4px;">
-                                            <div class="progress-bar bg-success rounded" role="progressbar" style="width: 60%;" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100"></div>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        45,6%
-                                        <div class="progress mt-1" style="height:4px;">
-                                            <div class="progress-bar bg-info rounded" role="progressbar" style="width: 90%;" aria-valuenow="90" aria-valuemin="0" aria-valuemax="100"></div>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        6,85
-                                        <div class="progress mt-1" style="height:4px;">
-                                            <div class="progress-bar bg-danger rounded" role="progressbar" style="width: 30%;" aria-valuenow="30" aria-valuemin="0" aria-valuemax="100"></div>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        7:45
-                                        <div class="progress mt-1" style="height:4px;">
-                                            <div class="progress-bar bg-warning rounded" role="progressbar" style="width: 40%;" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100"></div>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        33.8%
-                                        <div class="progress mt-1" style="height:4px;">
-                                            <div class="progress-bar bg-success rounded" role="progressbar" style="width: 80%;" aria-valuenow="80" aria-valuemin="0" aria-valuemax="100"></div>
-                                        </div>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>8-11-2016</td>
-                                    <td>
-                                        786
-                                        <div class="progress mt-1" style="height:4px;">
-                                            <div class="progress-bar bg-danger rounded" role="progressbar" style="width: 60%;" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100"></div>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        485
-                                        <div class="progress mt-1" style="height:4px;">
-                                            <div class="progress-bar bg-primary rounded" role="progressbar" style="width: 50%;" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100"></div>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        769
-                                        <div class="progress mt-1" style="height:4px;">
-                                            <div class="progress-bar bg-warning rounded" role="progressbar" style="width: 70%;" aria-valuenow="70" aria-valuemin="0" aria-valuemax="100"></div>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        45,3%
-                                        <div class="progress mt-1" style="height:4px;">
-                                            <div class="progress-bar bg-success rounded" role="progressbar" style="width: 60%;" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100"></div>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        6,7%
-                                        <div class="progress mt-1" style="height:4px;">
-                                            <div class="progress-bar bg-info rounded" role="progressbar" style="width: 30%;" aria-valuenow="30" aria-valuemin="0" aria-valuemax="100"></div>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        8,56
-                                        <div class="progress mt-1" style="height:4px;">
-                                            <div class="progress-bar bg-danger rounded" role="progressbar" style="width: 40%;" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100"></div>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        10:55
-                                        <div class="progress mt-1" style="height:4px;">
-                                            <div class="progress-bar bg-warning rounded" role="progressbar" style="width: 70%;" aria-valuenow="70" aria-valuemin="0" aria-valuemax="100"></div>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        33.8%
-                                        <div class="progress mt-1" style="height:4px;">
-                                            <div class="progress-bar bg-success rounded" role="progressbar" style="width: 40%;" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100"></div>
-                                        </div>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>15-10-2016</td>
-                                    <td>
-                                        786
-                                        <div class="progress mt-1" style="height:4px;">
-                                            <div class="progress-bar bg-danger rounded" role="progressbar" style="width: 65%;" aria-valuenow="65" aria-valuemin="0" aria-valuemax="100"></div>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        523
-                                        <div class="progress mt-1" style="height:4px;">
-                                            <div class="progress-bar bg-primary rounded" role="progressbar" style="width: 80%;" aria-valuenow="80" aria-valuemin="0" aria-valuemax="100"></div>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        736
-                                        <div class="progress mt-1" style="height:4px;">
-                                            <div class="progress-bar bg-warning rounded" role="progressbar" style="width: 80%;" aria-valuenow="80" aria-valuemin="0" aria-valuemax="100"></div>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        78,3%
-                                        <div class="progress mt-1" style="height:4px;">
-                                            <div class="progress-bar bg-success rounded" role="progressbar" style="width: 70%;" aria-valuenow="70" aria-valuemin="0" aria-valuemax="100"></div>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        6,6%
-                                        <div class="progress mt-1" style="height:4px;">
-                                            <div class="progress-bar bg-info rounded" role="progressbar" style="width: 70%;" aria-valuenow="70" aria-valuemin="0" aria-valuemax="100"></div>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        7,56
-                                        <div class="progress mt-1" style="height:4px;">
-                                            <div class="progress-bar bg-danger rounded" role="progressbar" style="width: 44%;" aria-valuenow="44" aria-valuemin="0" aria-valuemax="100"></div>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        4:30
-                                        <div class="progress mt-1" style="height:4px;">
-                                            <div class="progress-bar bg-warning rounded" role="progressbar" style="width: 68%;" aria-valuenow="68" aria-valuemin="0" aria-valuemax="100"></div>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        76.8%
-                                        <div class="progress mt-1" style="height:4px;">
-                                            <div class="progress-bar bg-success rounded" role="progressbar" style="width: 90%;" aria-valuenow="90" aria-valuemin="0" aria-valuemax="100"></div>
-                                        </div>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>8-8-2017</td>
-                                    <td>
-                                        624
-                                        <div class="progress mt-1" style="height:4px;">
-                                            <div class="progress-bar bg-danger rounded" role="progressbar" style="width: 45%;" aria-valuenow="45" aria-valuemin="0" aria-valuemax="100"></div>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        436
-                                        <div class="progress mt-1" style="height:4px;">
-                                            <div class="progress-bar bg-primary rounded" role="progressbar" style="width: 55%;" aria-valuenow="55" aria-valuemin="0" aria-valuemax="100"></div>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        756
-                                        <div class="progress mt-1" style="height:4px;">
-                                            <div class="progress-bar bg-warning rounded" role="progressbar" style="width: 95%;" aria-valuenow="95" aria-valuemin="0" aria-valuemax="100"></div>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        78,3%
-                                        <div class="progress mt-1" style="height:4px;">
-                                            <div class="progress-bar bg-success rounded" role="progressbar" style="width: 38%;" aria-valuenow="38" aria-valuemin="0" aria-valuemax="100"></div>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        6,4%
-                                        <div class="progress mt-1" style="height:4px;">
-                                            <div class="progress-bar bg-info rounded" role="progressbar" style="width: 30%;" aria-valuenow="30" aria-valuemin="0" aria-valuemax="100"></div>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        9,45
-                                        <div class="progress mt-1" style="height:4px;">
-                                            <div class="progress-bar bg-danger rounded" role="progressbar" style="width: 41%;" aria-valuenow="41" aria-valuemin="0" aria-valuemax="100"></div>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        9:05
-                                        <div class="progress mt-1" style="height:4px;">
-                                            <div class="progress-bar bg-warning rounded" role="progressbar" style="width: 67%;" aria-valuenow="67" aria-valuemin="0" aria-valuemax="100"></div>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        8.63%
-                                        <div class="progress mt-1" style="height:4px;">
-                                            <div class="progress-bar bg-success rounded" role="progressbar" style="width: 41%;" aria-valuenow="41" aria-valuemin="0" aria-valuemax="100"></div>
-                                        </div>
-                                    </td>
-                                </tr>
+                                @foreach (var item in Model)
+                                {
+                                    @*<a onclick="location.href='/DataDauVaos/Details/?id='+@item.Id+''" href="javascript:void()">*@
+
+                                    <tr id="tr_@item.Id">
+                                        <td>
+                                            <a class="pointer-events" onclick="location.href = '@(Url.Action("Details", "DataDauVaos", new { id = item.Id }))'">@Html.DisplayFor(modelItem => item.ODNumber)</a>
+                                        </td>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.Name)
+                                        </td>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.Adress)
+                                        </td>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.NgayGui)
+                                        </td>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.MaSP)
+                                        </td>
+                                        <td style="max-width:200px; overflow:hidden" data-toggle="tooltip" data-placement="top" title="@item.LinkSanPham">
+                                            @Html.DisplayFor(modelItem => item.LinkSanPham)
+                                        </td>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.Mau)
+                                        </td>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.Size)
+                                        </td>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.CanMua)
+                                        </td>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.DaMua)
+                                        </td>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.GiaUSD)
+                                        </td>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.GiaSale)
+                                        </td>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.ShipOrTax)
+                                        </td>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.TongVND)
+                                        </td>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.Debt)
+                                        </td>
+                                      
+                                        <td style="max-width:200px; overflow:hidden" data-toggle="tooltip" data-placement="top" title="@item.GhiChu">
+                                            @Html.DisplayFor(modelItem => item.GhiChu)
+                                        </td>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.ItemInTrack)
+                                        </td>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.LinkTrack)
+                                        </td>
+
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.Payment)
+                                        </td>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.Rate)
+                                        </td>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.Status)
+                                        </td>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.TongVND)
+                                        </td>
+                                        @*<td>
+                                                @Html.DisplayFor(modelItem => item.Address)
+                                            </td>
+                                            <td>
+                                                @Html.DisplayFor(modelItem => item.Name)
+                                            </td>
+                                            <td>
+                                                @Html.DisplayFor(modelItem => item.Shippto)
+                                            </td>*@
+                                        <td>
+                                            @*<a onclick="location.href='/DataDauVaos/Details/?id='+@item.Id+''" href="javascript:void()"> Detail </a>
+                                                ||  <a onclick="location.href='/DataDauVaos/Edit/?id='+@item.Id+''" href="javascript:void()"> Edit </a>
+                                                ||  <a href="javascript:void()" onclick="DeletePage(@item.Id,'id=@item.Id','/DataDauVaos/Ajax_delete_data')"> Delete </a>*@
+                                            @*<a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                                                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
+                                                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>*@
+
+                                        </td>
+                                    </tr>
+
+                                }
                             </tbody>
                         </table>
+
                     </div>
                 </div>
+                <nav aria-label="Page navigation example">
+                    <ul class="pagination justify-content-end px-3 mt-3">
+                        <li style="display:flex;align-items:center">
+                            <p class="m-0 mx-3">Total @ViewBag.totalData</p>
+                        </li>
+                        @{
+                            int numberPage = ViewBag.numberPage;
+                            int pageCurrent = ViewBag.pageCurrent;
+                            int offset = 2;//number display page
+
+
+                            //config FirstLink
+                            if (pageCurrent > 1)
+                            {
+                                int prevPage = pageCurrent - 1;
+                                var PrevLink = new Dictionary<string, string> {
+                                            { "Day", Context.Request.Query["Day"].ToString()},
+                                            { "Month", Context.Request.Query["Month"].ToString()},
+                                            { "Year", Context.Request.Query["Year"].ToString()},
+                                            { "page", prevPage.ToString() }
+                                        };
+                                <li class="page-item"><a asp-controller="DataDauVaos" asp-action="Index" asp-all-route-data="PrevLink" class="page-link">Prev Link</a></li>
+                            }
+
+                            int from = pageCurrent - offset;
+                            int to = pageCurrent + offset;
+                            if (from <= 0)
+                            {
+                                from = 1;
+                                to = offset * 2;
+                            }
+
+
+                            if (to > numberPage)
+                            {
+                                to = numberPage;
+                            }
+
+                            int x;
+                            for (x = from; x <= to; x++)
+                            {
+                                var parms = new Dictionary<string, string>
+                                                                                                                                                                                                                                {
+                                             { "Day", Context.Request.Query["Day"].ToString()},
+                                             { "Month", Context.Request.Query["Month"].ToString()},
+                                             { "Year", Context.Request.Query["Year"].ToString()},
+                                             { "page",x.ToString() }
+                                        };
+                                if (pageCurrent == x)
+                                {
+                                    <li class="page-item active"><a asp-controller="DataDauVaos" asp-action="Index" asp-all-route-data="parms" class="page-link">@x</a></li>
+                                }
+                                else
+                                {
+                                    <li class="page-item"><a asp-controller="DataDauVaos" asp-action="Index" asp-all-route-data="parms" class="page-link">@x</a></li>
+                                }
+
+                            }
+
+                            if (pageCurrent < numberPage - (to / 2))
+                            {
+                                <li class="page-item"><a class="page-link">...</a></li>
+                                var LastLink = new Dictionary<string, string> {
+                                             { "Day", Context.Request.Query["Day"].ToString()},
+                                             { "Month", Context.Request.Query["Month"].ToString()},
+                                             { "Year", Context.Request.Query["Year"].ToString()},
+                                             { "page", numberPage.ToString() } };
+                                <li class="page-item"><a asp-controller="DataDauVaos" asp-action="Index" asp-all-route-data="LastLink" class="page-link">Last Link</a></li>
+                            }
+
+                            if (pageCurrent < numberPage)
+                            {
+                                int nextPage = pageCurrent + 1;
+                                var NextLink = new Dictionary<string, string> {
+                                             { "Day", Context.Request.Query["Day"].ToString()},
+                                             { "Month", Context.Request.Query["Month"].ToString()},
+                                             { "Year", Context.Request.Query["Year"].ToString()},
+                                             { "page",nextPage.ToString() }  };
+                                <li class="page-item"><a asp-controller="DataDauVaos" asp-action="Index" asp-all-route-data="NextLink" class="page-link">Next Link</a></li>
+                            }
+                        }
+                    </ul>
+                </nav>
             </div>
         </div>
     </div>
-    <!-- sessions-section end -->
-    <!--<div class="col-md-6 col-xl-4">
-        <div class="card user-card">
-            <div class="card-header">
-                <h5>Profile</h5>
-            </div>
-            <div class="card-body  text-center">
-                <div class="usre-image">
-                    <img src="../assets/images/widget/img-round1.jpg" class="img-radius wid-100 m-auto" alt="User-Profile-Image">
-                </div>
-                <h6 class="f-w-600 m-t-25 m-b-10">Alessa Robert</h6>
-                <p>Active | Male | Born 23.05.1992</p>
-                <hr>
-                <p class="m-t-15">Activity Level: 87%</p>
-                <div class="bg-c-blue counter-block m-t-10 p-20">
-                    <div class="row">
-                        <div class="col-4">
-                            <i class="fas fa-calendar-check text-white f-20"></i>
-                            <h6 class="text-white mt-2 mb-0">1256</h6>
-                        </div>
-                        <div class="col-4">
-                            <i class="fas fa-user text-white f-20"></i>
-                            <h6 class="text-white mt-2 mb-0">8562</h6>
-                        </div>
-                        <div class="col-4">
-                            <i class="fas fa-folder-open text-white f-20"></i>
-                            <h6 class="text-white mt-2 mb-0">189</h6>
-                        </div>
-                    </div>
-                </div>
-                <p class="m-t-15">Lorem Ipsum is simply dummy text of the printing and typesetting industry.</p>
-                <hr>
-                <div class="row justify-content-center user-social-link">
-                    <div class="col-auto"><a href="#!"><i class="fab fa-facebook-f text-primary f-22"></i></a></div>
-                    <div class="col-auto"><a href="#!"><i class="fab fa-twitter text-c-info f-22"></i></a></div>
-                    <div class="col-auto"><a href="#!"><i class="fab fa-dribbble text-c-red f-22"></i></a></div>
-                </div>
-            </div>
-        </div>
-    </div>-->
 </div>
 <script src="~/js/DataDauVao/index.js" asp-append-version="true"></script>
+
+
+

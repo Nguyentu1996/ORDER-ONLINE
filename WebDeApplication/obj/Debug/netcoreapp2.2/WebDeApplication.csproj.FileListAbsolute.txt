@@ -398,3 +398,8 @@ D:\Source_n_tu\ASP-NET\ORDER-ONLINE\ORDER-ONLINE\WebDeApplication\obj\Debug\netc
 D:\Source_n_tu\ASP-NET\ORDER-ONLINE\ORDER-ONLINE\WebDeApplication\obj\Debug\netcoreapp2.2\WebDeApplication.Views.pdb
 D:\Source_n_tu\ASP-NET\ORDER-ONLINE\ORDER-ONLINE\WebDeApplication\obj\Debug\netcoreapp2.2\WebDeApplication.genruntimeconfig.cache
 D:\Source_n_tu\ASP-NET\ORDER-ONLINE\ORDER-ONLINE\WebDeApplication\obj\Debug\netcoreapp2.2\WebDeApplication.csproj.CopyComplete
+D:\Source_n_tu\ASP-NET\ORDER-ONLINE\ORDER-ONLINE\WebDeApplication\obj\Debug\netcoreapp2.2\Razor\Views\DashboardDatas\Delete.cshtml.g.cs
+D:\Source_n_tu\ASP-NET\ORDER-ONLINE\ORDER-ONLINE\WebDeApplication\obj\Debug\netcoreapp2.2\Razor\Views\DashboardDatas\Details.cshtml.g.cs
+D:\Source_n_tu\ASP-NET\ORDER-ONLINE\ORDER-ONLINE\WebDeApplication\obj\Debug\netcoreapp2.2\Razor\Views\DashboardDatas\Index.cshtml.g.cs
+D:\Source_n_tu\ASP-NET\ORDER-ONLINE\ORDER-ONLINE\WebDeApplication\obj\Debug\netcoreapp2.2\Razor\Views\DashboardDatas\profit.cshtml.g.cs
+D:\Source_n_tu\ASP-NET\ORDER-ONLINE\ORDER-ONLINE\WebDeApplication\obj\Debug\netcoreapp2.2\Razor\Views\DashboardDatas\Cancel.cshtml.g.cs

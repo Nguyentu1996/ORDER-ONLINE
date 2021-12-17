@@ -253,39 +253,39 @@ namespace WebDeApplication.Controllers
 
         }
         // GET: DataDauVaos
-        public async Task<IActionResult> Index()
-        {
-            var joinning = await (from data in _context.DataDauVao
-                                  join email in _context.EmailReader on data.ODNumber equals email.ODNumber
-                                  select new EmailReaderViewModel
-                                  {
-                                      Address = email.address,
-                                      CanMua = data.CanMua,
-                                      DaMua = data.DaMua,
-                                      Debt = data.Debt,
-                                      GhiChu = data.GhiChu,
-                                      GiaSale = data.GiaSale,
-                                      GiaUSD = data.GiaUSD,
-                                      ItemInTrack = data.ItemInTrack,
-                                      MaSP = data.MaSP,
-                                      Mau = data.Mau,
-                                      NgayGui = data.NgayGui,
-                                      LinkTrack = data.LinkTrack,
-                                      ODNumber = data.ODNumber,
-                                      LinkSanPham = data.LinkSanPham,
-                                      Name = email.name,
-                                      Shippto = email.shippto,
-                                      Payment = data.Payment,
-                                      Rate = data.Rate,
-                                      Status = data.Status,
-                                      TongUSD = data.TongUSD,
-                                      TongVND = data.TongVND,
-                                      ShipOrTax = data.ShipOrTax,
-                                      Size = data.Size,
-                                      Id = data.Id
-                                  }).ToListAsync();
-            return View(joinning);
-        }
+        //public async Task<IActionResult> Index()
+        //{
+        //    var joinning = await (from data in _context.DataDauVao
+        //                          join email in _context.EmailReader on data.ODNumber equals email.ODNumber
+        //                          select new EmailReaderViewModel
+        //                          {
+        //                              Address = email.address,
+        //                              CanMua = data.CanMua,
+        //                              DaMua = data.DaMua,
+        //                              Debt = data.Debt,
+        //                              GhiChu = data.GhiChu,
+        //                              GiaSale = data.GiaSale,
+        //                              GiaUSD = data.GiaUSD,
+        //                              ItemInTrack = data.ItemInTrack,
+        //                              MaSP = data.MaSP,
+        //                              Mau = data.Mau,
+        //                              NgayGui = data.NgayGui,
+        //                              LinkTrack = data.LinkTrack,
+        //                              ODNumber = data.ODNumber,
+        //                              LinkSanPham = data.LinkSanPham,
+        //                              Name = email.name,
+        //                              Shippto = email.shippto,
+        //                              Payment = data.Payment,
+        //                              Rate = data.Rate,
+        //                              Status = data.Status,
+        //                              TongUSD = data.TongUSD,
+        //                              TongVND = data.TongVND,
+        //                              ShipOrTax = data.ShipOrTax,
+        //                              Size = data.Size,
+        //                              Id = data.Id
+        //                          }).ToListAsync();
+        //    return View(joinning);
+        //}
         // read email
         public async Task<IActionResult> ReadEmail(string Day, string Month, string Year, int? page = 0)
         {
@@ -1344,9 +1344,7 @@ namespace WebDeApplication.Controllers
                               name = e.name == null ? _context.EmailReader.FirstOrDefault(em => em.ODNumber == e.ODNumber && e.status2 == "2").name : e.name,
                               shippto = e.shippto,
                               shipped = e.shipped,
-                              status = e.status,
-                              //summary = e.summary,
-                              //subject = e.subject,
+                              status = e.status,                           
                               fromAddress = e.fromAddress,
                               toAddress = e.toAddress,
                               tracking = e.tracking,
@@ -1361,8 +1359,13 @@ namespace WebDeApplication.Controllers
                 Shipped = e.shipped,
                 Id = e.Id,
             }).ToList();
+            ViewData["ListTrack"] = result.Select(e => new TrackingViewModel
+            {
+                Track = e.tracking,
+                Shipped = e.shipped,
+                Id = e.Id,
+            }).ToList();
 
-           
             int limit = 50;
             int start;
             if (page > 0)
@@ -1419,94 +1422,94 @@ namespace WebDeApplication.Controllers
             return dataAll.ToList();
         }
         // GET: DataDauVaos/Search/Date
-        [HttpGet]
-        public async Task<IActionResult> Index(string Day, string Month, string Year, int? page = 0)
-        {
-            int dayFn;
-            int monthFn;
-            int yearFn;
+        //[HttpGet]
+        //public async Task<IActionResult> Index(string Day, string Month, string Year, int? page = 0)
+        //{
+        //    int dayFn;
+        //    int monthFn;
+        //    int yearFn;
 
-            var joinning = (from d in _context.DataDauVao
-                            //join email in _context.EmailReader on d.ODNumber equals email.ODNumber
-                            orderby  d.NgayGui descending
-                            select new EmailReaderViewModel
-                            {
-                                Name = d.Name,
-                                Address = d.Adress,
-                                CanMua = d.CanMua,
-                                DaMua = d.DaMua,
-                                Debt = d.Debt,
-                                GhiChu = d.GhiChu,
-                                GiaSale = d.GiaSale,
-                                GiaUSD = d.GiaUSD,
-                                ItemInTrack = d.ItemInTrack,
-                                MaSP = d.MaSP,
-                                Mau = d.Mau,
-                                NgayGui = d.NgayGui,
-                                LinkTrack = d.LinkTrack,
-                                ODNumber = d.ODNumber,
-                                LinkSanPham = d.LinkSanPham,
-                                //Name = email.name,
-                                //Shippto = email.shippto,
-                                Payment = d.Payment,
-                                Rate = d.Rate,
-                                //Status = String.IsNullOrEmpty(email.status) ? "check" : email.status,
-                                TongUSD = d.TongUSD,
-                                TongVND = d.TongVND,
-                                ShipOrTax = d.ShipOrTax,
-                                Size = d.Size,
-                                Id = d.Id
-                            }).ToList();
+        //    var joinning = (from d in _context.DataDauVao
+        //                    //join email in _context.EmailReader on d.ODNumber equals email.ODNumber
+        //                    orderby  d.NgayGui descending
+        //                    select new EmailReaderViewModel
+        //                    {
+        //                        Name = d.Name,
+        //                        Address = d.Adress,
+        //                        CanMua = d.CanMua,
+        //                        DaMua = d.DaMua,
+        //                        Debt = d.Debt,
+        //                        GhiChu = d.GhiChu,
+        //                        GiaSale = d.GiaSale,
+        //                        GiaUSD = d.GiaUSD,
+        //                        ItemInTrack = d.ItemInTrack,
+        //                        MaSP = d.MaSP,
+        //                        Mau = d.Mau,
+        //                        NgayGui = d.NgayGui,
+        //                        LinkTrack = d.LinkTrack,
+        //                        ODNumber = d.ODNumber,
+        //                        LinkSanPham = d.LinkSanPham,
+        //                        //Name = email.name,
+        //                        //Shippto = email.shippto,
+        //                        Payment = d.Payment,
+        //                        Rate = d.Rate,
+        //                        //Status = String.IsNullOrEmpty(email.status) ? "check" : email.status,
+        //                        TongUSD = d.TongUSD,
+        //                        TongVND = d.TongVND,
+        //                        ShipOrTax = d.ShipOrTax,
+        //                        Size = d.Size,
+        //                        Id = d.Id
+        //                    }).ToList();
 
-            if (!String.IsNullOrEmpty(Day))
-            {
-                dayFn = Int32.Parse(Day);
-                joinning = joinning.Where(x =>
-                {
-                    return DateTime.ParseExact(x.NgayGui, "dd/MM/yyyy", CultureInfo.InvariantCulture).Day == dayFn;
+        //    if (!String.IsNullOrEmpty(Day))
+        //    {
+        //        dayFn = Int32.Parse(Day);
+        //        joinning = joinning.Where(x =>
+        //        {
+        //            return DateTime.ParseExact(x.NgayGui, "dd/MM/yyyy", CultureInfo.InvariantCulture).Day == dayFn;
 
-                }).ToList();
-            }
-            if (!String.IsNullOrEmpty(Month))
-            {
-                monthFn = Int32.Parse(Month);
+        //        }).ToList();
+        //    }
+        //    if (!String.IsNullOrEmpty(Month))
+        //    {
+        //        monthFn = Int32.Parse(Month);
 
-                joinning = joinning.Where(x => DateTime.ParseExact(x.NgayGui, "dd/MM/yyyy", CultureInfo.InvariantCulture).Month == monthFn).ToList();
-            }
-            if (!String.IsNullOrEmpty(Year))
-            {
-                yearFn = Int32.Parse(Year);
-                joinning = joinning.Where(x => DateTime.ParseExact(x.NgayGui, "dd/MM/yyyy", CultureInfo.InvariantCulture).Year == yearFn).ToList();
-            }
-            //Order by Datetime
-            // End
-            // Pagination
-            int limit = 50;
-            int start;
-            if (page > 0)
-            {
-                page = page;
-            }
-            else
-            {
-                page = 1;
-            }
-            start = (int)(page - 1) * limit;
+        //        joinning = joinning.Where(x => DateTime.ParseExact(x.NgayGui, "dd/MM/yyyy", CultureInfo.InvariantCulture).Month == monthFn).ToList();
+        //    }
+        //    if (!String.IsNullOrEmpty(Year))
+        //    {
+        //        yearFn = Int32.Parse(Year);
+        //        joinning = joinning.Where(x => DateTime.ParseExact(x.NgayGui, "dd/MM/yyyy", CultureInfo.InvariantCulture).Year == yearFn).ToList();
+        //    }
+        //    //Order by Datetime
+        //    // End
+        //    // Pagination
+        //    int limit = 50;
+        //    int start;
+        //    if (page > 0)
+        //    {
+        //        page = page;
+        //    }
+        //    else
+        //    {
+        //        page = 1;
+        //    }
+        //    start = (int)(page - 1) * limit;
 
-            ViewBag.pageCurrent = page;
+        //    ViewBag.pageCurrent = page;
 
-            int total = totalData(joinning);
+        //    int total = totalData(joinning);
 
-            ViewBag.totalData = total;
+        //    ViewBag.totalData = total;
 
-            ViewBag.numberPage = numberPage(total, limit);
-            // End
-            var data = paginationData(start, limit, joinning);
-            return View(data);
-        }
+        //    ViewBag.numberPage = numberPage(total, limit);
+        //    // End
+        //    var data = paginationData(start, limit, joinning);
+        //    return View(data);
+        //}
         // GET: DataDauVaos/Create
         [HttpGet]
-        public async Task<IActionResult> ListOrder(string Day, string Month, string Year, int? page = 0)
+        public async Task<IActionResult> Index(string Day, string Month, string Year, int? page = 0)
         {
             int dayFn;
             int monthFn;
@@ -1594,8 +1597,10 @@ namespace WebDeApplication.Controllers
         {
             return View();
         }
-
-
+        //public IActionResult Index()
+        //{
+        //    return View();
+        //}
 
         // POST: DataDauVaos/Create
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
@@ -1749,7 +1754,7 @@ namespace WebDeApplication.Controllers
         {
             return _context.DataDauVao.Any(e => e.Id == id);
         }
-
+       
         [HttpPost]
         public async Task<IActionResult> Import(IFormFile postedFile)
         {

@@ -181,7 +181,7 @@
                 <a class="nav-link active text-uppercase" id="home-tab" data-toggle="tab" href="#home" role="tab" aria-controls="home" aria-selected="true">ODNumber</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link text-uppercase" id="profile-tab" data-toggle="tab" href="#profile" role="tab" aria-controls="profile" aria-selected="false">Profile</a>
+                <a class="nav-link text-uppercase" id="profile-tab" data-toggle="tab" href="#profile" role="tab" aria-controls="profile" aria-selected="false">Track</a>
             </li>
         </ul>
         <div class="tab-content" id="myTabContent">
@@ -204,12 +204,12 @@
             <div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-tab">
                 <div class="col-md-12">
                     <div class="form-group" style="max-height: 400px; overflow:auto">
-                        @foreach (var item in ViewData["ListODnumber"] as List<OdNumberStatus>)
+                        @foreach (var item in ViewData["ListTrack"] as List<TrackingViewModel>)
                         {
                             string style = item.Shipped ? "background-color:yellow" : null;
 
                             <a style="@style" class="pointer-events" onclick="location.href = '@(Url.Action("EmailReaderDetails", "DataDauVaos", new { id = item.Id }))'">
-                                @item.OdNumber
+                                @item.Track
                             </a>
                             <span>, </span>
                         }

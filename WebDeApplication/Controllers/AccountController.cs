@@ -73,6 +73,12 @@ namespace WebDeApplication.Controllers
 
                 if (result.Succeeded)
                 {
+                    var user = userManager.FindByNameAsync(model.UserName).Result;
+                    var roles = userManager.GetRolesAsync(user).Result.ToArray();
+                    if (roles.Any(role => role.Equals("Admin")))
+                    {
+                        return RedirectToAction("Index", "DashboardDatas");
+                    }
                     return RedirectToAction("Index", "DataDauVaos");
                 }
 
