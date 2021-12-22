@@ -336,10 +336,10 @@ namespace WebDeApplication.Controllers
             var emails = await GetAllEmail(received);
 
             IEnumerable<Task<EmailContent>> downloadTasksQuery =
-                 from email in emails 
-                 where !_context.EmailReader.Any(e => e.messageId == email.messageId)
-                 select ProcessUrlAsync(email, received);
-
+                 //from email in emails 
+                 //where !_context.EmailReader.Any(e => e.messageId == email.messageId)
+                 //select ProcessUrlAsync(email, received);
+            emails.Where(m => !_context.EmailReader.Any(e => e.messageId == m.messageId)).Select(e => ProcessUrlAsync(e, received));
             List<Task<EmailContent>> downloadTasks = downloadTasksQuery.ToList();
             while (downloadTasks.Any())
             {
