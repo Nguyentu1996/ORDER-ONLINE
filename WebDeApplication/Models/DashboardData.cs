@@ -12,8 +12,8 @@ namespace WebDeApplication.Models
         public int Id { get; set; }
         public int Year { get; set; }
         public int Month { get; set; }
-        public float TotalProfit { get; set; }
-        public float PercentProfit { get; set; }
+        public double TotalProfit { get; set; }
+        public double PercentProfit { get; set; }
         public int TotalOrder { get; set; }
         public float PercentOrder { get; set; }
 

@@ -10,11 +10,12 @@ namespace WebDeApplication.Models
     public class EmailDelay
     {
         public int Id { get; set; }
-        public int EmailId { get; set; }
+        public int EmailGroupId { get; set; }
 
         public string ODNumber { get; set; }
-        public string ODParrent { get; set; }
+        public int ODParrent { get; set; }
         public string receivedTime { get; set; }
+        public string MessageId { get; set; }
 
         public string fromAddress { get; set; }
         public string status { get; set; }

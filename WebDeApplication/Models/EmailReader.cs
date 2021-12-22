@@ -30,13 +30,13 @@ namespace WebDeApplication.Models
         public string status2 { get; set; }
         public Boolean isChecked { get; set; }
         public string orderDate { get; set; }
-        public string estimateDilivery { get; set; }
+        public DateTime estimateDilivery { get; set; }
         public string address { get; set; }
         public string shippto { get; set; }
         public string tracking { get; set; }
         public string name { get; set; }
         public string orderTotal { get; set; }
-        public string odParrent { get; set; }
+        public int odParrent { get; set; }
         public bool shipped { get; set; }
 
     }

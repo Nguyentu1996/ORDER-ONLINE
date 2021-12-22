@@ -22,6 +22,20 @@ namespace WebDeApplication.Models.Data
         public DbSet<EmailDelay> EmailDelay { get; set; }
         public DbSet<DashboardData> DashboardData { get; set; }
         public DbSet<Item> Item { get; set; }
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<EmailReader>()              
+                .HasIndex(p => new { p.ODNumber, p.status2 })
+                .HasFilter(null);
+            modelBuilder.Entity<EmailReader>()
+                .HasIndex(p => p.messageId)
+                .HasFilter(null);
+            modelBuilder.Entity<EmailReader>()
+                    .Property(b => b.odParrent)
+                    .HasDefaultValue(0);
 
+            base.OnModelCreating(modelBuilder);
+
+        }
     }
 }

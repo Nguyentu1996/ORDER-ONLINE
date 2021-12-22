@@ -48,7 +48,7 @@
         </div>*@
             <div class="row">
                 <div class="col-md-12">
-                    <form class="form-inline  w-100" asp-action="ReadEmailAction" method="post">
+                    <form class="form-inline  w-100" asp-action="ProcessEmail" method="post">
                         <div class="form-group mb-2  w-50 ">
                             <label>Code: &nbsp;</label>
                             <input type="text" id="m-search" name="code" class="form-control w-75" placeholder="Code . . ." autocomplete="off">
@@ -93,19 +93,19 @@
                                 <th>
                                     @Html.DisplayNameFor(model => model.status)
                                 </th>
-                                <th>
-                                    @Html.DisplayNameFor(model => model.address)
-                                </th>
+                                @*<th>
+            @Html.DisplayNameFor(model => model.address)
+        </th>*@
                                 <th>
                                     @Html.DisplayNameFor(model => model.shippto)
                                 </th>
 
                                 @*<th>
-                                    @Html.DisplayNameFor(model => model.subject)
-                                </th>
-                                <th>
-                                    @Html.DisplayNameFor(model => model.summary)
-                                </th>*@
+            @Html.DisplayNameFor(model => model.subject)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.summary)
+        </th>*@
                                 <th>
                                     @Html.DisplayNameFor(model => model.fromAddress)
                                 </th>
@@ -119,6 +119,9 @@
                                     @Html.DisplayNameFor(model => model.receivedTime)
                                 </th>
                                 <th>
+                                    @Html.DisplayNameFor(model => model.estimatime)
+                                </th>
+                                <th>
 
                                 </th>
                             </tr>
@@ -127,10 +130,10 @@
                             @foreach (var item in Model)
                             {
                                 
-                            <tr id="tr_@item.Id" >
+                            <tr id="tr_@item.Id">
                                 <td>
                                     <a class="pointer-events" onclick="location.href = '@(Url.Action("EmailReaderDetails", "DataDauVaos", new { id = item.Id }))'">  @Html.DisplayFor(modelItem => item.ODNumber)</a>
-                                  
+
                                 </td>
                                 <td>
                                     @Html.DisplayFor(modelItem => item.name)
@@ -138,18 +141,11 @@
                                 <td>
                                     @Html.DisplayFor(modelItem => item.status)
                                 </td>
-                                <td style="max-width:200px; overflow:hidden" data-toggle="tooltip" data-placement="top" title="@item.address">
-                                    @Html.DisplayFor(modelItem => item.address)
-                                </td>
+
                                 <td style="max-width:200px; overflow:hidden" data-toggle="tooltip" data-placement="top" title="@item.shippto">
                                     @Html.DisplayFor(modelItem => item.shippto)
                                 </td>
-                                @*<td style="max-width:200px; overflow:hidden" data-toggle="tooltip" data-placement="top" title="@item.subject">
-                                    @Html.DisplayFor(modelItem => item.subject)
-                                </td>
-                                <td style="max-width:200px; overflow:hidden" data-toggle="tooltip" data-placement="top" title="@item.summary">
-                                    @Html.DisplayFor(modelItem => item.summary)
-                                </td>*@
+
                                 <td>
                                     @Html.DisplayFor(modelItem => item.fromAddress)
                                 </td>
@@ -160,7 +156,7 @@
                                     }
                                     else
                                     {
-                                        <p>---</p>
+                                        <p class="m-0">---</p>
                                     }
 
                                 </td>
@@ -168,9 +164,19 @@
                                     @Html.DisplayFor(modelItem => item.toAddress)
                                 </td>
                                 <td>
-                                    @Html.DisplayFor(modelItem => item.receivedTime)
+                                    @Html.DisplayFor(modelItem => item.received)
                                 </td>
+                                <td>
+                                    @if (item.estimatime.Year < 2)
+                                    {
+                                        <p class="m-0">---</p>
+                                    }
+                                    else
+                                    {
+                                        @Html.DisplayFor(modelItem => item.estimatime)
 
+                                    }
+                                </td>
                                 <td>
                                 </td>
                             </tr>

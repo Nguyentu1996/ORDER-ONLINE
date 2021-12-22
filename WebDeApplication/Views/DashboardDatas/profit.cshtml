@@ -3,12 +3,14 @@
 @{
     ViewData["Title"] = "Create";
     Layout = "~/Views/Shared/_Layout.cshtml";
+    var format = System.Globalization.CultureInfo.GetCultureInfo("vi-VN");
+
 }
 
 
 
 <div class="rows">
-    <div class="col-sm-12">
+    @*<div class="col-sm-12">
         <div class="accordion" id="accordionExample">
             <div class="card">
                 <div class="card-header" id="headingOne">
@@ -98,11 +100,11 @@
                 </div>
             </div>
         </div>
-    </div>
+    </div>*@
     <div class="col-xl-12 col-md-12">
         <div class="card table-card">
             <div class="card-header">
-                <h5 class="mb-0">List data</h5>
+                <h5 class="mb-0">List Profit</h5>
                 @*<div class="card-header-right">
                         <form asp-action="Import" method="post" enctype="multipart/form-data">
                             <input type="file" name="postedFile" id="fileupload" />
@@ -136,7 +138,7 @@
                                     <th>
                                         @Html.DisplayNameFor(model => model.GiaSale)
                                     </th>
-                                    
+
                                     <th>
                                         @Html.DisplayNameFor(model => model.TongUSD)
                                     </th>
@@ -147,9 +149,13 @@
                                         @Html.DisplayNameFor(model => model.tyGiaMua)
                                     </th>
                                     <th>
+
                                         @Html.DisplayNameFor(model => model.TotalProfit)
                                     </th>
+                                    @*<th>
 
+                                        @Html.DisplayNameFor(model => model.NetProfit)
+                                    </th>*@
                                     <th>
                                         @Html.DisplayNameFor(model => model.NgayGui)
                                     </th>
@@ -162,21 +168,16 @@
                             <tbody>
                                 @foreach (var item in Model)
                                 {
-                                    @*<a onclick="location.href='/DataDauVaos/Details/?id='+@item.Id+''" href="javascript:void()">*@
-
                                     <tr id="tr_@item.Id">
                                         <td>
-                                            @* <a class="pointer-events" onclick="location.href = '@(Url.Action("Details", "DataDauVaos", new { id = item.Id }))'">*@
-                                            @Html.DisplayFor(modelItem => item.ODnumber)
-                                            @*</a>*@
+                                            <a class="pointer-events" onclick="location.href = '@(Url.Action("Details", "DataDauVaos", new { id = item.OrderId }))'">
+                                                @Html.DisplayFor(modelItem => item.ODnumber)
+                                            </a>
                                         </td>
                                         <td>
                                             @Html.DisplayFor(modelItem => item.Name)
                                         </td>
-                                      
-                                        <td>
-                                            @Html.DisplayFor(modelItem => item.NgayGui)
-                                        </td>                      
+
                                         <td>
                                             @Html.DisplayFor(modelItem => item.CanMua)
                                         </td>
@@ -189,7 +190,7 @@
                                         <td>
                                             @Html.DisplayFor(modelItem => item.GiaSale)
                                         </td>
-                                       
+
                                         <td>
                                             @Html.DisplayFor(modelItem => item.TongUSD)
                                         </td>
@@ -199,33 +200,18 @@
                                         <td>
                                             @Html.DisplayFor(modelItem => item.tyGiaMua)
                                         </td>
-                                       
+
                                         <td>
-                                            @Html.DisplayFor(modelItem => item.TotalProfit)
+                                            @String.Format(format, "{0:c0}", item.TotalProfit)
+                                            @*@Html.DisplayFor(modelItem => item.TotalProfit)*@
                                         </td>
+                                        @*<td>
+                                            @String.Format(format, "{0:c0}", item.NetProfit)
+                                        </td>*@
                                         <td>
                                             @Html.DisplayFor(modelItem => item.NgayGui)
-                                        </td>                           
-                                        @*<td>
-                                            @Html.DisplayFor(modelItem => item.TongVND)
-                                        </td>*@
-                                        @*<td>
-                                                @Html.DisplayFor(modelItem => item.Address)
-                                            </td>
-                                            <td>
-                                                @Html.DisplayFor(modelItem => item.Name)
-                                            </td>
-                                            <td>
-                                                @Html.DisplayFor(modelItem => item.Shippto)
-                                            </td>*@
+                                        </td>
                                         <td>
-                                            @*<a onclick="location.href='/DataDauVaos/Details/?id='+@item.Id+''" href="javascript:void()"> Detail </a>
-                                                ||  <a onclick="location.href='/DataDauVaos/Edit/?id='+@item.Id+''" href="javascript:void()"> Edit </a>
-                                                ||  <a href="javascript:void()" onclick="DeletePage(@item.Id,'id=@item.Id','/DataDauVaos/Ajax_delete_data')"> Delete </a>*@
-                                            @*<a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                                                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                                                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>*@
-
                                         </td>
                                     </tr>
 
@@ -256,7 +242,7 @@
                                             { "Year", Context.Request.Query["Year"].ToString()},
                                             { "page", prevPage.ToString() }
                                         };
-                                <li class="page-item"><a asp-controller="DataDauVaos" asp-action="Index" asp-all-route-data="PrevLink" class="page-link">Prev Link</a></li>
+                                <li class="page-item"><a asp-controller="DashboardDatas" asp-action="Profit" asp-all-route-data="PrevLink" class="page-link">Prev Link</a></li>
                             }
 
                             int from = pageCurrent - offset;
@@ -285,11 +271,11 @@
                                         };
                                 if (pageCurrent == x)
                                 {
-                                    <li class="page-item active"><a asp-controller="DataDauVaos" asp-action="Index" asp-all-route-data="parms" class="page-link">@x</a></li>
+                                    <li class="page-item active"><a asp-controller="DashboardDatas" asp-action="Profit" asp-all-route-data="parms" class="page-link">@x</a></li>
                                 }
                                 else
                                 {
-                                    <li class="page-item"><a asp-controller="DataDauVaos" asp-action="Index" asp-all-route-data="parms" class="page-link">@x</a></li>
+                                    <li class="page-item"><a asp-controller="DashboardDatas" asp-action="Profit" asp-all-route-data="parms" class="page-link">@x</a></li>
                                 }
 
                             }
@@ -302,7 +288,7 @@
                                              { "Month", Context.Request.Query["Month"].ToString()},
                                              { "Year", Context.Request.Query["Year"].ToString()},
                                              { "page", numberPage.ToString() } };
-                                <li class="page-item"><a asp-controller="DataDauVaos" asp-action="Index" asp-all-route-data="LastLink" class="page-link">Last Link</a></li>
+                                <li class="page-item"><a asp-controller="DashboardDatas" asp-action="Profit" asp-all-route-data="LastLink" class="page-link">Last Link</a></li>
                             }
 
                             if (pageCurrent < numberPage)
@@ -313,7 +299,7 @@
                                              { "Month", Context.Request.Query["Month"].ToString()},
                                              { "Year", Context.Request.Query["Year"].ToString()},
                                              { "page",nextPage.ToString() }  };
-                                <li class="page-item"><a asp-controller="DataDauVaos" asp-action="Index" asp-all-route-data="NextLink" class="page-link">Next Link</a></li>
+                                <li class="page-item"><a asp-controller="DashboardDatas" asp-action="Profit" asp-all-route-data="NextLink" class="page-link">Next Link</a></li>
                             }
                         }
                     </ul>

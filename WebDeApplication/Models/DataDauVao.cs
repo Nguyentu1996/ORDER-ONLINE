@@ -24,6 +24,8 @@ namespace WebDeApplication.Models
 
         public string Size { get; set; }
         [Display(Name = "Cần mua")]
+        [Required]
+
         public string CanMua { get; set; }
         [Display(Name = "Đã mua")]
 
@@ -50,6 +52,7 @@ namespace WebDeApplication.Models
 
         public string GhiChu { get; set; }
         [Display(Name = "Order number")]
+        [Required]
 
         public string ODNumber { get; set; }
 
@@ -70,10 +73,14 @@ namespace WebDeApplication.Models
         [Display(Name = "Ngày Tạo")]
 
         public long CreateDate { get; set; }
+        public DateTime CreateDateFD { get; set; }
+
         [Display(Name = "Tỷ giá mua")]
+        [Required]
 
         public int tyGiaMua { get; set; }
         [Display(Name = "Tỷ giá bán")]
+        [Required]
 
         public int tyGiaBan { get; set; }
 

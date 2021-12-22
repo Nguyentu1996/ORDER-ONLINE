@@ -1,4 +1,4 @@
-﻿@model WebDeApplication.Models.EmailReader
+﻿@model WebDeApplication.Models.EmailGroup
 
 @{
     ViewData["Title"] = "EmailReaderDetails";
@@ -30,19 +30,11 @@
                                 <input asp-for="toAddress" class="form-control" readonly />
                                 <span asp-validation-for="toAddress" class="text-danger"></span>
                             </div>
-                            <div class="form-group">
-                                <label asp-for="fromAddress" class="control-label"></label>
-                                <input asp-for="fromAddress" class="form-control" readonly />
-                                <span asp-validation-for="fromAddress" class="text-danger"></span>
-                            </div>
-                            <div class="form-group">
-                                <label asp-for="tracking" class="control-label"></label>
-                                <input asp-for="tracking" class="form-control" readonly />
-                                <span asp-validation-for="tracking" class="text-danger"></span>
-                            </div>
+                    
+
                             <input type="hidden" asp-for="Id" />
                             <button type="submit" class="btn btn-primary">Submit</button>
-                            <a href="javascript:history.go(-1)" class="btn btn-primary">Back</a>
+                            <a asp-action="ReadEmail" class="btn btn-primary">Back</a>
                         </div>
                         <div class="col-md-3">
 
@@ -52,15 +44,19 @@
                                 <span asp-validation-for="receivedTime" class="text-danger"></span>
                             </div>
                             <div class="form-group">
-                                <label asp-for="status" class="control-label"></label>
-                                <input asp-for="status" class="form-control" readonly />
-                                <span asp-validation-for="status" class="text-danger"></span>
+                                <label asp-for="estimatime" class="control-label"></label>
+                                <input asp-for="estimatime" class="form-control" readonly />
+                                <span asp-validation-for="estimatime" class="text-danger"></span>
                             </div>
                             <div class="form-group">
                                 <label asp-for="address" class="control-label"></label>
                                 <input asp-for="address" class="form-control" readonly />
                                 <span asp-validation-for="address" class="text-danger"></span>
                             </div>
+                           
+
+                        </div>
+                        <div class="col-md-3">
                             <div class="form-group">
                                 <label asp-for="shippto" class="control-label"></label>
                                 <input asp-for="shippto" class="form-control" readonly />
@@ -71,30 +67,34 @@
                                 <input asp-for="orderTotal" class="form-control" readonly />
                                 <span asp-validation-for="orderTotal" class="text-danger"></span>
                             </div>
-
+                            <div class="form-group">
+                                <label asp-for="fromAddress" class="control-label"></label>
+                                <input asp-for="fromAddress" class="form-control" readonly />
+                                <span asp-validation-for="fromAddress" class="text-danger"></span>
+                            </div>
+                       
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-3">
                             <div class="form-group">
-                                <label asp-for="subject" class="control-label"></label>
-                                <input asp-for="subject" class="form-control" readonly />
-                                <span asp-validation-for="subject" class="text-danger"></span>
+                                <label asp-for="tracking" class="control-label"></label>
+                                <input asp-for="tracking" class="form-control" readonly />
+                                <span asp-validation-for="tracking" class="text-danger"></span>
                             </div>
                             <div class="form-group">
-                                <label asp-for="summary" class="control-label"></label>
-                                <textarea readonly asp-for="summary" class="form-control" id="exampleFormControlTextarea1" rows="7"></textarea>
-
-                                <span asp-validation-for="summary" class="text-danger"></span>
+                                <label asp-for="status" class="control-label"></label>
+                                <input asp-for="status" class="form-control" readonly />
+                                <span asp-validation-for="status" class="text-danger"></span>
                             </div>
-                            <div class="d-flex align-content-center" style="height:40px">
-
-                                <div class="form-check px-0">
-                                    @Html.CheckBoxFor(model => model.shipped)
-
-                                    <label class="form-check-label" asp-for="shipped">
-                                    </label>
+                            <div class="form-group text-left m-b-0">
+                                @*<label asp-for="status" class="control-label" style="opacity:0"></label>*@
+                                <input class="form-control" style="opacity:0" readonly />
+                                <div class="checkbox checkbox-primary d-inline">
+                                    <input type="checkbox" asp-for="shipped"  id="checkbox-fill-a1">
+                                    <label for="checkbox-fill-a1" class="cr"> Shipped</label>
                                 </div>
                             </div>
                         </div>
+                        
                     </form>
                 </div>
             </div>

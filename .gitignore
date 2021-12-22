@@ -3,4 +3,5 @@
 # compiled output
 /WebDeApplication/bin
 /WebDeApplication/appsettings.json
-
+/WebDeApplication/obj
+/WebDeApplication/.config

@@ -91,6 +91,10 @@
                                         }
                                     </select>
                                 </div>
+                                    <div class="form-group mx-sm-3 mb-2 ">
+                                        <label class="control-label"> Name: &nbsp;</label>
+                                        <input name="Name" value="@Context.Request.Query["Name"]" class="form-control"  />
+                                    </div>
                                 <button type="submit" class="btn btn-primary mb-2">Search</button>
 
                             </form>
@@ -306,26 +310,27 @@
                             <p class="m-0 mx-3">Total @ViewBag.totalData</p>
                         </li>
                         @{
-                            int numberPage = ViewBag.numberPage;
-                            int pageCurrent = ViewBag.pageCurrent;
-                            int offset = 2;//number display page
+                                        int numberPage = ViewBag.numberPage;
+                                        int pageCurrent = ViewBag.pageCurrent;
+                                        int offset = 2;//number display page
 
 
-                            //config FirstLink
-                            if (pageCurrent > 1)
-                            {
-                                int prevPage = pageCurrent - 1;
-                                var PrevLink = new Dictionary<string, string> {
+                                        //config FirstLink
+                                        if (pageCurrent > 1)
+                                        {
+                                            int prevPage = pageCurrent - 1;
+                                            var PrevLink = new Dictionary<string, string> {
                                             { "Day", Context.Request.Query["Day"].ToString()},
                                             { "Month", Context.Request.Query["Month"].ToString()},
                                             { "Year", Context.Request.Query["Year"].ToString()},
+                                            { "Name", Context.Request.Query["Name"] },
                                             { "page", prevPage.ToString() }
                                         };
                                 <li class="page-item"><a asp-controller="DataDauVaos" asp-action="Index" asp-all-route-data="PrevLink" class="page-link">Prev Link</a></li>
                             }
 
-                            int from = pageCurrent - offset;
-                            int to = pageCurrent + offset;
+                                int from = pageCurrent - offset;
+                                int to = pageCurrent + offset;
                             if (from <= 0)
                             {
                                 from = 1;
@@ -346,6 +351,7 @@
                                              { "Day", Context.Request.Query["Day"].ToString()},
                                              { "Month", Context.Request.Query["Month"].ToString()},
                                              { "Year", Context.Request.Query["Year"].ToString()},
+                                             { "Name", Context.Request.Query["Name"] },
                                              { "page",x.ToString() }
                                         };
                                 if (pageCurrent == x)
@@ -366,6 +372,7 @@
                                              { "Day", Context.Request.Query["Day"].ToString()},
                                              { "Month", Context.Request.Query["Month"].ToString()},
                                              { "Year", Context.Request.Query["Year"].ToString()},
+                                             { "Name", Context.Request.Query["Name"] },
                                              { "page", numberPage.ToString() } };
                                 <li class="page-item"><a asp-controller="DataDauVaos" asp-action="Index" asp-all-route-data="LastLink" class="page-link">Last Link</a></li>
                             }
@@ -377,6 +384,7 @@
                                              { "Day", Context.Request.Query["Day"].ToString()},
                                              { "Month", Context.Request.Query["Month"].ToString()},
                                              { "Year", Context.Request.Query["Year"].ToString()},
+                                             { "Name", Context.Request.Query["Name"] },
                                              { "page",nextPage.ToString() }  };
                                 <li class="page-item"><a asp-controller="DataDauVaos" asp-action="Index" asp-all-route-data="NextLink" class="page-link">Next Link</a></li>
                             }

@@ -10,10 +10,11 @@ namespace WebDeApplication.Models
     public class DataProfitOrder
     {   
         public int Id { get; set; }
+        public int OrderId { get; set; }
         public string ODnumber { get; set; }
         public string Name { get; set; }
         public string NgayGui { get; set; }
-        public float TotalProfit { get; set; }
+        public double TotalProfit { get; set; }
         public string SiteName { get; set; }
         public int tyGiaMua { get; set; }
         public int tyGiaBan { get; set; }
@@ -23,5 +24,7 @@ namespace WebDeApplication.Models
         public Boolean orderStop { get; set; }
         public string GiaSale { get; set; }
         public string TongUSD { get; set; }
+        public double NetProfit { get; set; }
+
     }
 }

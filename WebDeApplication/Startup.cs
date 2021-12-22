@@ -56,6 +56,7 @@ namespace WebDeApplication
                 options.Password.RequiredUniqueChars = 3;
                 options.Password.RequireNonAlphanumeric = false;
             }).AddEntityFrameworkStores<ApplicationDbContext>();
+            //services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);

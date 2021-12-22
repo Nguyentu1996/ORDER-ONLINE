@@ -60,23 +60,19 @@
                                 <input asp-for="LinkSanPham" class="form-control" readonly />
                                 <span asp-validation-for="LinkSanPham" class="text-danger"></span>
                             </div>
-                            @*<div class="d-flex align-content-center" style="height:40px">
 
-                                    <div class="form-check px-0">
-                                        @Html.CheckBoxFor(model => model.isChecked)
 
-                                        <label class="form-check-label">
-                                            Status
-                                        </label>
-                                    </div>
-                                </div>*@
+                            <div class="form-group">
+                                <label asp-for="tyGiaMua" class="control-label"></label>
+                                <input asp-for="tyGiaMua" class="form-control" readonly />
+                                <span asp-validation-for="tyGiaMua" class="text-danger"></span>
+                            </div>
                             <div class="form-group text-left mt-2">
                                 <div class="checkbox checkbox-primary d-inline">
                                     <input type="checkbox" asp-for="stopOrder" name="checkbox-fill-1" id="checkbox-fill-a1">
                                     <label for="checkbox-fill-a1" class="cr">Stop Order</label>
                                 </div>
                             </div>
-
                         </div>
                         <div class="col-md-3">
 
@@ -106,7 +102,11 @@
                                 <span asp-validation-for="ShipOrTax" class="text-danger"></span>
                             </div>
 
-
+                            <div class="form-group">
+                                <label asp-for="tyGiaBan" class="control-label"></label>
+                                <input asp-for="tyGiaBan" class="form-control" readonly />
+                                <span asp-validation-for="tyGiaBan" class="text-danger"></span>
+                            </div>
                         </div>
                         <div class="col-md-3">
 
@@ -135,7 +135,10 @@
                                 <input asp-for="Size" class="form-control" readonly />
                                 <span asp-validation-for="Size" class="text-danger"></span>
                             </div>
-
+                            <div class="form-group">
+                              
+                            </div>
+                           
                         </div>
                         <div class="col-md-3">
 
@@ -206,12 +209,16 @@
                     <div class="form-group" style="max-height: 400px; overflow:auto">
                         @foreach (var item in ViewData["ListTrack"] as List<TrackingViewModel>)
                         {
-                            string style = item.Shipped ? "background-color:yellow" : null;
+                            if (item.Track != null)
+                            {
+                                string style = item.Shipped ? "background-color:yellow" : null;
 
-                            <a style="@style" class="pointer-events" onclick="location.href = '@(Url.Action("EmailReaderDetails", "DataDauVaos", new { id = item.Id }))'">
-                                @item.Track
-                            </a>
-                            <span>, </span>
+                                <a style="@style" class="pointer-events" onclick="location.href = '@(Url.Action("EmailReaderDetails", "DataDauVaos", new { id = item.Id }))'">
+                                    @item.Track
+                                </a>
+                                <span>, </span>
+                            }
+
                         }
 
                     </div>
@@ -246,19 +253,11 @@
                                     <th>
                                         Status
                                     </th>
-                                    <th>
-                                        Address
-                                    </th>
+
                                     <th>
                                         Shippto
                                     </th>
 
-                                    @*<th>
-                                            Subject
-                                        </th>
-                                        <th>
-                                            Summary
-                                        </th>*@
                                     <th>
                                         FromAddress
                                     </th>
@@ -266,7 +265,13 @@
                                         Tracking
                                     </th>
                                     <th>
+                                        TotalOrder
+                                    </th>
+                                    <th>
                                         ReceivedTime
+                                    </th>
+                                    <th>
+                                        EstimateTime
                                     </th>
                                     <th>
                                         Shipped
@@ -275,58 +280,60 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach (var item in ViewData["emailList"] as List<EmailReader>)
+                                @if (ViewData["emailList"] != null)
                                 {
+                                    @foreach (var item in ViewData["emailList"] as List<EmailGroup>)
+                                    {
 
-                                    string style = item.shipped ? "background-color:yellow" : null;
-                                    var param = new Dictionary<string, string> {
+                                        string style = item.shipped ? "background-color:yellow" : null;
+                                        var param = new Dictionary<string, string> {
                                         { "idOrder", Context.Request.Query["id"].ToString()},
                                         { "page",  Context.Request.Query["page"].ToString() },
                                         { "id", item.Id.ToString() },
+                                        };
+                                        <tr id="tr_@item.Id">
+                                            <td>
 
-                                    };
-                                    <tr id="tr_@item.Id">
-                                        <td>
-
-                                            <a style="@style" class="pointer-events" onclick="location.href = '@(Url.Action("EmailReaderDetails", "DataDauVaos", new { id = item.Id }))'">
-                                                @Html.DisplayFor(modelItem => item.ODNumber)
-                                            </a>
-                                        </td>
-                                        <td>
-                                            @Html.DisplayFor(modelItem => item.name)
-                                        </td>
-                                        <td>
-                                            @Html.DisplayFor(modelItem => item.status)
-                                        </td>
-                                        <td style="max-width:200px; overflow:hidden" data-toggle="tooltip" data-placement="top" title="@item.address">
-                                            @Html.DisplayFor(modelItem => item.address)
-                                        </td>
-                                        <td style="max-width:200px; overflow:hidden" data-toggle="tooltip" data-placement="top" title="@item.shippto">
-                                            @Html.DisplayFor(modelItem => item.shippto)
-                                        </td>
-                                        @*<td style="max-width:200px; overflow:hidden" data-toggle="tooltip" data-placement="top" title="@item.subject">
-                                                @Html.DisplayFor(modelItem => item.subject)
+                                                <a style="@style" class="pointer-events" onclick="location.href = '@(Url.Action("EmailReaderDetails", "DataDauVaos", new { id = item.Id }))'">
+                                                    @Html.DisplayFor(modelItem => item.ODNumber)
+                                                </a>
                                             </td>
-                                            <td style="max-width:200px; overflow:hidden" data-toggle="tooltip" data-placement="top" title="@item.summary">
-                                                @Html.DisplayFor(modelItem => item.summary)
-                                            </td>*@
-                                        <td>
-                                            @Html.DisplayFor(modelItem => item.fromAddress)
-                                        </td>
-                                        <td>
-                                            @Html.DisplayFor(modelItem => item.tracking)
+                                            <td>
+                                                @Html.DisplayFor(modelItem => item.name)
+                                            </td>
+                                            <td>
+                                                @Html.DisplayFor(modelItem => item.status)
+                                            </td>
 
-                                        </td>
-                                        <td>
-                                            @Html.DisplayFor(modelItem => item.receivedTime)
-                                        </td>
+                                            <td style="max-width:200px; overflow:hidden" data-toggle="tooltip" data-placement="top" title="@item.shippto">
+                                                @Html.DisplayFor(modelItem => item.shippto)
+                                            </td>
 
-                                        <td>
-                                            <a asp-controller="DataDauVaos" asp-action="Shipped" asp-all-route-data="param">Shipped</a>
-                                        </td>
-                                    </tr>
+                                            <td>
+                                                @Html.DisplayFor(modelItem => item.fromAddress)
+                                            </td>
+                                            <td>
+                                                @Html.DisplayFor(modelItem => item.tracking)
 
+                                            </td>
+                                            <td>
+                                                @Html.DisplayFor(modelItem => item.orderTotal)
+
+                                            </td>
+                                            <td>
+                                                @Html.DisplayFor(modelItem => item.receivedTime)
+                                            </td>
+                                            <td>
+                                                @Html.DisplayFor(modelitem => item.estimatime)
+                                            </td>
+                                            <td>
+                                                <a asp-controller="DataDauVaos" asp-action="Shipped" asp-all-route-data="param">Shipped</a>
+                                            </td>
+                                        </tr>
+
+                                    }
                                 }
+
                             </tbody>
                         </table>
                     </div>

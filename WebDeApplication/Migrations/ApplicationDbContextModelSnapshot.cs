@@ -194,7 +194,7 @@ namespace WebDeApplication.Migrations
 
                     b.Property<float>("PercentOrder");
 
-                    b.Property<float>("PercentProfit");
+                    b.Property<double>("PercentProfit");
 
                     b.Property<string>("SiteName");
 
@@ -204,7 +204,7 @@ namespace WebDeApplication.Migrations
 
                     b.Property<int>("TotalOrder");
 
-                    b.Property<float>("TotalProfit");
+                    b.Property<double>("TotalProfit");
 
                     b.Property<int>("Year");
 
@@ -221,7 +221,8 @@ namespace WebDeApplication.Migrations
 
                     b.Property<string>("Adress");
 
-                    b.Property<string>("CanMua");
+                    b.Property<string>("CanMua")
+                        .IsRequired();
 
                     b.Property<long>("CreateDate");
 
@@ -249,7 +250,8 @@ namespace WebDeApplication.Migrations
 
                     b.Property<string>("NgayGui");
 
-                    b.Property<string>("ODNumber");
+                    b.Property<string>("ODNumber")
+                        .IsRequired();
 
                     b.Property<string>("Payment");
 
@@ -294,15 +296,19 @@ namespace WebDeApplication.Migrations
 
                     b.Property<string>("Name");
 
+                    b.Property<double>("NetProfit");
+
                     b.Property<string>("NgayGui");
 
                     b.Property<string>("ODnumber");
+
+                    b.Property<int>("OrderId");
 
                     b.Property<string>("SiteName");
 
                     b.Property<string>("TongUSD");
 
-                    b.Property<float>("TotalProfit");
+                    b.Property<double>("TotalProfit");
 
                     b.Property<bool>("orderStop");
 
@@ -321,19 +327,19 @@ namespace WebDeApplication.Migrations
                         .ValueGeneratedOnAdd()
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<int>("Month");
-
                     b.Property<string>("Name");
 
                     b.Property<string>("ODNumber");
 
                     b.Property<string>("ODParrent");
 
+                    b.Property<string>("ReceivedTime");
+
+                    b.Property<DateTime>("ReceivedTimeFD");
+
                     b.Property<string>("Shippto");
 
                     b.Property<string>("Status");
-
-                    b.Property<int>("Year");
 
                     b.HasKey("Id");
 
@@ -346,7 +352,9 @@ namespace WebDeApplication.Migrations
                         .ValueGeneratedOnAdd()
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<int>("EmailId");
+                    b.Property<int>("EmailGroupId");
+
+                    b.Property<string>("MessageId");
 
                     b.Property<string>("ODNumber");
 
@@ -381,7 +389,9 @@ namespace WebDeApplication.Migrations
                         .ValueGeneratedOnAdd()
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<int>("EmailId");
+                    b.Property<int>("EmailReaderId");
+
+                    b.Property<string>("MessageId");
 
                     b.Property<string>("ODNumber");
 
@@ -407,6 +417,8 @@ namespace WebDeApplication.Migrations
 
                     b.Property<string>("status");
 
+                    b.Property<string>("status2");
+
                     b.Property<string>("toAddress");
 
                     b.Property<string>("tracking");
@@ -428,7 +440,7 @@ namespace WebDeApplication.Migrations
 
                     b.Property<string>("ccAddress");
 
-                    b.Property<string>("estimateDilivery");
+                    b.Property<DateTime>("estimateDilivery");
 
                     b.Property<string>("folderId");
 
@@ -475,6 +487,8 @@ namespace WebDeApplication.Migrations
                     b.Property<string>("tracking");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("ODNumber", "status2");
 
                     b.ToTable("EmailReader");
                 });

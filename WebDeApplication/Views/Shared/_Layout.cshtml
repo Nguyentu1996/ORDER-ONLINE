@@ -68,24 +68,24 @@
                
 
                     <li class="nav-item pcoded-hasmenu">
-                        <a href="#!" class="nav-link"><span class="pcoded-micon"><i class="feather icon-box"></i></span><span class="pcoded-mtext">Order</span></a>
+                        <a href="#!" class="nav-link"><span class="pcoded-micon"><i class="feather icon-box"></i></span><span class="pcoded-mtext">Quản Lý Order</span></a>
                         <ul class="pcoded-submenu">
-                            <li class=""><a asp-controller="DataDauVaos" asp-action="ReadEmail" class="">Read Email</a></li>
+                            <li class=""><a asp-controller="DataDauVaos" asp-action="ReadEmail" class="">Cập Nhật Email</a></li>
                         </ul>
                         <ul class="pcoded-submenu">
-                            <li class=""><a asp-controller="DataDauVaos" asp-action="Index" class="">List Order</a></li>
+                            <li class=""><a asp-controller="DataDauVaos" asp-action="Index" class="">Đơn Hàng</a></li>
                         </ul>
+                        @*<ul class="pcoded-submenu">
+                            <li class=""><a asp-controller="DataDauVaos" asp-action="Create" class="">Tạo Đơn Hàng</a></li>
+                        </ul>*@
                         <ul class="pcoded-submenu">
-                            <li class=""><a asp-controller="DataDauVaos" asp-action="Create" class="">Create</a></li>
-                        </ul>
-                        <ul class="pcoded-submenu">
-                            <li class=""><a asp-controller="DataDauVaos" asp-action="TotalItem" class="">Total Item</a></li>
+                            <li class=""><a asp-controller="DataDauVaos" asp-action="TotalItem" class="">Thống Kê Item</a></li>
                         </ul>
                     </li>
 
                     @if (User.Identity.IsAuthenticated && User.IsInRole("Admin")) { 
                         <li class="nav-item">
-                            <a asp-controller="Administration" asp-action="ListRole" class="nav-link"><span class="pcoded-micon"><i class="feather icon-settings"></i></span><span class="pcoded-mtext">List Role</span></a>
+                            <a asp-controller="Administration" asp-action="ListRole" class="nav-link"><span class="pcoded-micon"><i class="feather icon-settings"></i></span><span class="pcoded-mtext">Quản Lý Account</span></a>
                         </li>
                     }
                     @*</li>*@
@@ -236,10 +236,10 @@
                                     <div class="row align-items-center">
                                         <div class="col-md-12">
                                             <div class="page-header-title">
-                                                <h5>Home</h5>
+                                                <h5>Trang Chủ</h5>
                                             </div>
                                             <ul class="breadcrumb">
-                                                <li class="breadcrumb-item"><a href="index.html"><i class="feather icon-home"></i></a></li>
+                                                <li class="breadcrumb-item"><a href="/DashboardDatas"><i class="feather icon-home"></i></a></li>
                                                 <li class="breadcrumb-item"><a href="#!">Analytics Dashboard</a></li>
                                             </ul>
                                         </div>

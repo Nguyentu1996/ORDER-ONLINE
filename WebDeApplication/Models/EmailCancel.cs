@@ -12,13 +12,14 @@ namespace WebDeApplication.Models
     {
         public int Id { get; set; }
         public string ODNumber { get; set; }
-        public string ODParrent { get; set; }
+        public int ODParrent { get; set; }
 
         public string Status { get; set; }
 
         public string Name { get; set; }
         public string Shippto { get; set; }
-        public int Month { get; set; }
-        public int Year { get; set; }
+        public DateTime ReceivedTimeFD { get; set; }
+        public string ReceivedTime { get; set; }
+
     }
 }
