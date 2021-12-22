@@ -291,32 +291,32 @@ namespace WebDeApplication.Controllers
             _context.EmailGroup.Update(emGroup);
 
             _context.SaveChanges();
-            //_context.DataDauVao.ToList().ForEach(d =>
-            //{
+            _context.DataDauVao.ToList().ForEach(d =>
+            {
 
-            //    //    float offset = d.tyGiaBan - d.tyGiaMua;
-            //    //    var totalNet = 0D;
-            //    //    _context.EmailGroup.Where(e => e.ODParrent == d.Id && (e.shipped == true || e.status2 != "1")).ToList().ForEach(
-            //    //        oderItem =>
-            //    //        {
-            //    //            float a;
-            //    //            if (oderItem.orderTotal != null)
-            //    //            {
-            //    //                var b = float.TryParse(oderItem.orderTotal.Replace("$", ""), out a);
-            //    //                if (b)
-            //    //                {
-            //    //                    totalNet = totalNet + (offset * a);
-            //    //                }
-            //    //            }
+                float offset = d.tyGiaBan - d.tyGiaMua;
+                var totalNet = 0D;
+                _context.EmailGroup.Where(e => e.ODParrent == d.Id && (e.shipped == true || e.status2 != "1")).ToList().ForEach(
+                    oderItem =>
+                    {
+                        float a;
+                        if (d.TongUSD != null)
+                        {
+                            var b = float.TryParse(d.TongUSD, out a);
+                            if (b)
+                            {
+                                totalNet = totalNet + (offset * a);
+                            }
+                        }
 
-            //    //        }
-            //    //    );
+                    }
+                );
 
-            //    var dprofit = _context.DataProfitOrder.Single(dp => dp.OrderId == d.Id);
-            //    //    dprofit.NetProfit = totalNet;
-            //    _context.DataProfitOrder.Update(dprofit);
+                var dprofit = _context.DataProfitOrder.Single(dp => dp.OrderId == d.Id);
+                dprofit.NetProfit = totalNet;
+                _context.DataProfitOrder.Update(dprofit);
 
-            //});
+            });
             var data = _context.DashboardData.OrderByDescending(d => d.Id).FirstOrDefault();
             data.TotalDelay = _context.EmailDelay.Where(e => e.shipped == false).Count();
             _context.SaveChanges();

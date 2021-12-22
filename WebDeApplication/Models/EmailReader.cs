@@ -36,7 +36,7 @@ namespace WebDeApplication.Models
         public string tracking { get; set; }
         public string name { get; set; }
         public string orderTotal { get; set; }
-        public int odParrent { get; set; }
+        public int? odParrent { get; set; }
         public bool shipped { get; set; }
 
     }

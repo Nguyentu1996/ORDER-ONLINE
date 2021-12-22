@@ -260,30 +260,31 @@ namespace WebDeApplication.Controllers
             }
             _context.EmailGroup.Update(emGroup);
             _context.SaveChanges();
-            //_context.DataDauVao.Where(d => d.stopOrder == false).ToList().ForEach(d => {
-              
-            //    float offset = d.tyGiaBan - d.tyGiaMua;     
-            //    var totalNet = 0D;
-            //    _context.EmailGroup.Where(e => e.ODParrent == d.Id && (e.shipped == true || e.status2 != "1")).ToList().ForEach(
-            //        oderItem =>
-            //        {
-            //            float a;
-            //            if (oderItem.orderTotal != null)
-            //            {
-            //                var b = float.TryParse(oderItem.orderTotal.Replace("$", ""), out a);
-            //                if (b)
-            //                {
-            //                    totalNet = totalNet + (offset * a);
-            //                }
-            //            }
+            _context.DataDauVao.Where(d => d.stopOrder == false).ToList().ForEach(d =>
+            {
 
-            //        }
-            //    );
+                float offset = d.tyGiaBan - d.tyGiaMua;
+                var totalNet = 0D;
+                _context.EmailGroup.Where(e => e.ODParrent == d.Id && (e.shipped == true || e.status2 != "1")).ToList().ForEach(
+                    oderItem =>
+                    {
+                        float a;
+                        if (d.TongUSD != null)
+                        {
+                            var b = float.TryParse(d.TongUSD, out a);
+                            if (b)
+                            {
+                                totalNet = totalNet + (offset * a);
+                            }
+                        }
 
-            //        var dprofit = _context.DataProfitOrder.Single(dp => dp.ODnumber == d.ODNumber);
-            //        dprofit.NetProfit = totalNet;
-            //        _context.DataProfitOrder.Update(dprofit);
-            //});
+                    }
+                );
+
+                var dprofit = _context.DataProfitOrder.Single(dp => dp.ODnumber == d.ODNumber);
+                dprofit.NetProfit = totalNet;
+                _context.DataProfitOrder.Update(dprofit);
+            });
 
             return RedirectToAction("Details", new { id = idOrder, page = page });
         }
@@ -305,7 +306,7 @@ namespace WebDeApplication.Controllers
                 page = 1;
             }
             start = (int)(page - 1) * limit;
-            var result = _context.EmailGroup.Select(e=> e).ToList();
+            var result = _context.EmailGroup.Select(e => e).ToList();
 
             ViewBag.pageCurrent = page;
 
@@ -322,6 +323,7 @@ namespace WebDeApplication.Controllers
         {
             return View();
         }
+        [HttpPost]
         public async Task<IActionResult> ProcessEmail(string code)
         {
             if (String.IsNullOrEmpty(code))
@@ -334,6 +336,7 @@ namespace WebDeApplication.Controllers
 
             received = await getAccessToken(code, received);
             var emails = await GetAllEmail(received);
+            if(emails.Count < 1) return RedirectToAction(nameof(ReadEmail));
 
             IEnumerable<Task<EmailContent>> downloadTasksQuery =
                  //from email in emails 
@@ -343,492 +346,572 @@ namespace WebDeApplication.Controllers
             List<Task<EmailContent>> downloadTasks = downloadTasksQuery.ToList();
             while (downloadTasks.Any())
             {
-                Task<EmailContent> finishedTask = await Task.WhenAny(downloadTasks);
-                downloadTasks.Remove(finishedTask);
-                if( finishedTask != null)
+                try
                 {
-                    var email = _context.EmailReader.Find(finishedTask.Result.data.messageId);
-                    if (email != null)
+                    Task<EmailContent> finishedTask = await Task.WhenAny(downloadTasks);
+                    if (finishedTask.IsFaulted)
                     {
-                        if (finishedTask.Result.data.content == null) continue;
-                        var tempData = finishedTask.Result.data.content;
+                        continue;
+                    }
+                    var task = await finishedTask;
+                    if (task != null)
+                    {
+                        var mail = (from em in emails where em.messageId == task.data.messageId.ToString() select em).FirstOrDefault();
+                        emails.Remove(mail);
+                        var email = new EmailReader();
 
-                        var tempMail = tempData.Split("address");
-                        if (tempMail.Length > 1)
+                        string[] splitString = Regex.Split(mail.subject, @"#");
+                        string[] digits = new string[] { };
+                        string[] digitStatus = new string[] { };
+                        //var oderUpdateLinkTrack = new DataDauVao();
+
+                        if (splitString.Length > 1)
                         {
-                            var tempMail1 = tempMail[1].Split("</span>");
-                            var tempMail2 = tempMail1[0].Replace("=\r\n", "");
-                            var tempMail3 = tempMail2.Replace("\">", "");
-                            email.address = tempMail3;
+                            digits = Regex.Split(splitString[1], @"\D+");
+                            digitStatus = Regex.Split(splitString[1], @"\s");
                         }
-                        else
+
+                        var status = "";
+                        if (digitStatus.Length > 1)
                         {
-                            tempMail = tempData.Split("tact Us");
-                            if (tempMail.Length < 2)
+
+                            for (int index = 1; index < digitStatus.Length; index++)
                             {
-                                tempMail = tempData.Split("tac=\r\nt Us");
+                                status += digitStatus[index] + " ";
+
+                            }
+                        }
+                        email.ODNumber = !String.IsNullOrEmpty(digits[0]) ? digits[0] : "";
+                        email.status = String.IsNullOrEmpty(status) ? "confirm" : status;
+                        if (!String.IsNullOrEmpty(status))
+                        {
+                            email.status = status;
+                        }
+                        email.address = "";
+                        if (email.status.Contains("has been shipped")) email.status2 = "2";
+                        if (email.status.Contains("is almost here!")) email.status2 = "3";
+
+                        if (email.status.Contains("confirm")) email.status2 = "1";
+
+                        if (email.status.Contains("has been partially shipped")) email.status2 = "0";
+
+                        if (email.status.Contains("has been cancelled"))
+                        {
+                            email.status2 = "-1";
+                            email.priority = "cancel";
+                        }
+
+                        email.ccAddress = mail.ccAddress;
+                        //email.estimateDilivery = "";
+                        email.folderId = mail.folderId;
+                        email.fromAddress = mail.fromAddress;
+                        email.Id = 0;
+                        email.messageId = mail.messageId;
+                        email.hasInline = mail.hasInline;
+                        email.summary = mail.summary;
+                        email.toAddress = mail.toAddress.Replace("@lt;", "").Replace("&gt;", "");
+                        email.shippto = "";
+                        email.sender = "";
+                        email.subject = mail.subject;
+                        email.orderDate = "";
+                        email.orderTotal = "";
+                        email.priority = "";
+                        email.receivedTime = mail.receivedTime;
+                        //todo
+                        email.receivedTimeLong = long.Parse(mail.receivedTime);
+                        email.sentDateInGMT = mail.sentDateInGMT;
+
+                        //_context.EmailReader.Add(email);
+                        //_context.SaveChanges();
+                        if (email != null)
+                        {
+                            if (task.data.content == null) continue;
+                            var tempData = task.data.content;
+
+                            var tempMail = tempData.Split("address");
+                            if (tempMail.Length > 1)
+                            {
+                                var tempMail1 = tempMail[1].Split("</span>");
+                                var tempMail2 = tempMail1[0].Replace("=\r\n", "");
+                                var tempMail3 = tempMail2.Replace("\">", "");
+                                email.address = tempMail3;
+                            }
+                            else
+                            {
+                                tempMail = tempData.Split("tact Us");
                                 if (tempMail.Length < 2)
                                 {
-                                    tempMail = tempData.Split("tact=\r\n Us");
-
-                                }
-                            }
-                            if (tempMail.Length < 2) continue;
-                            var temp = tempMail[1].Split("All rights reserve");
-                            if (temp.Length < 1)
-                            {
-                                continue;
-                            }
-                            var temp1 = Regex.Split(temp[0], "<a .?>(.*?)</a>");
-                            if (temp1.Length < 1)
-                            {
-                                continue;
-                            }
-                            var shippto6 = temp1[0].Replace("=\r\n", "");
-                            var shippto3 = shippto6.Split("color:#CCCCCC;\">");
-                            if (shippto3.Length < 2)
-                            {
-                                //var shippto3 = temp1[0].Split("color:#CCCCCC;\"=\r\n>");
-                                continue;
-                            }
-                            var shippto4 = shippto3[1].Split("</a>");
-                            if (shippto4.Length < 1)
-                            {
-                                continue;
-                            }
-                            var shippto5 = shippto4[0].Replace("=\r\n", "");
-                            email.address = shippto5;
-                        }
-                        // linkTrack
-
-                        if (email.status.Contains("confirm"))
-                        {
-                            var shippto = finishedTask.Result.data.content.Split("<b>SHIP TO</b><b>:</b>");
-                            if (shippto.Length < 2)
-                            {
-                                continue;
-                            }
-                            var shippto2 = shippto[1].Split("<br />\r\n\t");
-                            if (shippto2.Length < 1)
-                            {
-                                continue;
-                            }
-                            var shippto3 = shippto2[0].Replace("=\r\n", "");
-                            if (shippto3 == null)
-                            {
-                                continue;
-                            }
-                            var shippto4 = shippto3.Split("<br />");
-                            if (shippto4.Length < 1)
-                            {
-                                continue;
-                            }
-                            email.name = shippto4[0].Replace("<br>", "").Trim();
-                            if (email.name.Contains("<span"))
-                            {
-                                email.name = email.name.Split(">")[1].Trim();
-                            }
-                            if (shippto.Length > 0)
-                            {
-                                for (int index = 1; index < shippto.Length; index++)
-                                {
-                                    email.shippto += shippto[index];
-
-                                }
-                            }
-                            email.shippto = shippto4[1] + shippto4[2];
-                            // Order Total
-                            var orderTotal = finishedTask.Result.data.content.Replace("=\r\n", "");
-                            var estimateTime = orderTotal.Split("Estimated Delivery Date:</b>");
-                            if (estimateTime.Length > 1)
-                            {
-                                var estimateTime1 = estimateTime[1].Split("\r\n</span></td>\r\n</tr>\r\n");
-                                var estimateTime2 = estimateTime1[0].Trim();
-                                try
-                                {
-                                    DateTime dt = DateTime.Parse(estimateTime2, CultureInfo.InvariantCulture);
-                                    email.estimateDilivery = dt;
-
-                                    //TimeSpan epoch = (dt - new DateTime(1970, 1, 1, 0, 0, 0, 0).ToLocalTime());
-                                    //var unixTimestamp = (double)epoch.TotalMilliseconds;
-                                    //email.estimateDilivery = unixTimestamp.ToString();
-                                }
-                                catch (Exception e)
-                                {
-                                    //no estimateDilivery
-                                }
-                            }
-                            var oderTotal1 = orderTotal.Split("Gift Card:");
-                            if (oderTotal1.Length < 2) continue;
-                            var oderTotal2 = oderTotal1[1].Split("<br /> </td>");
-                            if (oderTotal2.Length < 2) continue;
-                            var oderTotal3 = oderTotal2[0].Replace("=2E", ".");
-                            email.orderTotal = oderTotal3;
-                            // item
-                            var item = orderTotal.Split("<td align=3D\"center\" width=3D\"200\"><a"); // include link
-                            if (item.Length < 1) continue;
-                            for (int index = 1; index < item.Length; index++)
-                            {
-                                var itemOD = new Item();
-                                itemOD.MessageId = email.messageId;
-                                itemOD.ODnumber = email.ODNumber;
-                                itemOD.ImageUrl = email.status2;
-                                itemOD.receiveiTime = email.receivedTime;
-                                itemOD.Address = email.address;
-                                var odList = item[index].Split("target=3D\"_blank\">");
-                                if (odList.Length < 1) continue;
-                                string[] stringArray = new string[odList.Length - 2];
-
-                                for (int odIndex = 2; odIndex < odList.Length; odIndex++)
-                                {
-                                    var odItem = odList[odIndex].Split("</a></span></td>");
-                                    stringArray[odIndex - 2] = odItem[0];
-                                }
-                                itemOD.Name = stringArray[0] + " ";
-                                if (!stringArray[1].Contains("ITEM")) itemOD.Name += stringArray[1];
-                                itemOD.Name.Replace("&amp", "");
-                                for (int j = 2; j < stringArray.Length; j++)
-                                {
-                                    var prop = stringArray[j];
-                                    if (prop.Contains("ITEM")) itemOD.ItemCd = prop;
-                                    //if (prop.Contains("Price")) {
-                                    //    itemOD.Price = stringArray[j + 1].Replace("=2E","");                                   
-                                    //}
-                                    if (prop.Contains("$")) itemOD.Price = prop.Replace("=2E", ".");
-
-                                    //if (prop.Contains("SIZE")) itemOD.Name += " "+ prop;
-                                    try
+                                    tempMail = tempData.Split("tac=\r\nt Us");
+                                    if (tempMail.Length < 2)
                                     {
-                                        if (prop.Contains("Qty")) itemOD.Quantity = Int16.Parse(prop.Replace("Qty: ", ""));
+                                        tempMail = tempData.Split("tact=\r\n Us");
 
                                     }
-                                    catch (Exception e)
-                                    {
-                                        itemOD.Quantity = Int16.Parse(prop.Replace("Qty:", ""));
-                                    }
                                 }
-                                _context.Item.Add(itemOD);
-                            }
-                        }
-                        if (email.status.Contains("has been shipped"))
-                        {
-                            var shipto = finishedTask.Result.data.content.Split("SHIP TO:</b><br />");
-                            if (shipto.Length < 1)
-                            {
-                                continue;
-                            }
-                            var shipto2 = Regex.Split(shipto[1], @"<span.*?>(.*?)<\\/span>");
-                            shipto = shipto2[0].Split("</span></span></td>");
-                            var shiptotemp = shipto[0].Replace("<span=\r\n style=3D\"color: #000000;\">", "");
-                            var shippto3 = shiptotemp.Replace("=\r\n", "");
-                            var shippto4 = shippto3.Split("<br />");
-                            if (shippto4.Length < 1)
-                            {
-                                continue;
-                            }
-                            email.name = shippto4[0].Trim();
-                            if (email.name.Contains("<span"))
-                            {
-                                email.name = email.name.Split(">")[1].Trim();
-                            }
-                            for (int index = 1; index < shippto4.Length; index++)
-                            {
-                                email.shippto += shippto4[index] + " ";
-
-                            }
-
-                            var tracking = tempData.Split("G #:");
-                            if (tracking.Length < 2)
-                            {
-                                continue;
-                            }
-                            var tracking1 = tracking[1].Split("SHIPMENT");
-                            if (tracking1.Length < 2)
-                            {
-                                continue;
-                            }
-                            var tracking2 = tracking1[0].Replace("=\r\n", "");
-                            var tracking3 = tracking2.Split("style=3D\"color: #000000;\">");
-                            if (tracking3.Length < 2)
-                            {
-                                continue;
-                            }
-                            var tracking4 = tracking3[1].Replace("</a><br /> <span", "");
-                            email.tracking = tracking4;
-                            // order total                      
-                            var orderTotal = finishedTask.Result.data.content.Replace("=\r\n", "");
-                            var oderTotal1 = orderTotal.Split("SHIPMENT ORDER TOTAL:</span>");
-                            if (oderTotal1.Length < 2) continue;
-                            var oderTotal2 = oderTotal1[1].Split("<br />");
-                            if (oderTotal2.Length < 2) continue;
-                            var oderTotal3 = oderTotal2[0].Replace("=2E", ".");
-                            email.orderTotal = oderTotal3;
-                            // item
-                            var item = orderTotal.Split("<td align=3D\"center\" width=3D\"200\"><a"); // include link
-                            if (item.Length < 1) continue;
-                            for (int index = 1; index < item.Length; index++)
-                            {
-                                var itemOD = new Item();
-                                itemOD.MessageId = email.messageId;
-                                itemOD.ODnumber = email.ODNumber;
-                                itemOD.ImageUrl = email.status2;
-                                itemOD.receiveiTime = email.receivedTime;
-                                itemOD.Address = email.address;
-
-                                var odList = item[index].Split("target=3D\"_blank\">");
-                                if (odList.Length < 1) continue;
-                                string[] stringArray = new string[odList.Length - 2];
-
-                                for (int odIndex = 2; odIndex < odList.Length; odIndex++)
-                                {
-                                    var odItem = odList[odIndex].Split("</a></span></td>");
-                                    stringArray[odIndex - 2] = odItem[0];
-                                }
-                                itemOD.Name = stringArray[0];
-
-                                if (!stringArray[1].Contains("ITEM")) itemOD.Name += " " + stringArray[1];
-                                itemOD.Name.Replace("&amp", "");
-
-                                for (int j = 2; j < stringArray.Length; j++)
-                                {
-                                    var prop = stringArray[j];
-                                    if (prop.Contains("<")) continue;
-                                    if (prop.Contains("ITEM")) itemOD.ItemCd = prop;
-                                    //if(prop.Contains(""))
-                                    //if (prop.Contains("Price"))
-                                    //{
-                                    //    itemOD.Price = stringArray[j + 1].Replace("=2E", "");
-                                    //}
-                                    if (prop.Contains("$"))
-                                    {
-                                        itemOD.Price = prop.Replace("=2E", ".");
-                                    }
-                                    //if (prop.Contains("SIZE")) itemOD.Name += " "+prop;
-                                    try
-                                    {
-                                        if (prop.Contains("Qty")) itemOD.Quantity = Int16.Parse(prop.Replace("Qty: ", ""));
-
-                                    }
-                                    catch (Exception e)
-                                    {
-                                        itemOD.Quantity = Int16.Parse(prop.Replace("Qty:", ""));
-                                    }
-                                }
-                                _context.Item.Add(itemOD);
-                            }
-
-                        }
-
-                        if (email.status.Contains("is almost here!"))
-                        {
-                            var tempD = finishedTask.Result.data.content.Replace("=\r\n", "");
-                            var shipto = tempD.Split("<b>SHIP TO:</b>");
-                            if (shipto.Length < 2)
-                            {
-
-                                shipto = finishedTask.Result.data.content.Split("<b>SHIP=\r\n TO:</b>");
-
-                            }
-                            if (shipto.Length < 2)
-                            {
-                                email.shippto = "shipto Split error";
-                            }
-                            var shiptoTemp = shipto[1].Split("<br></span></div></td><");
-                            if (shiptoTemp.Length < 1)
-                            {
-                                continue;
-                            }
-                            var shippto1 = shiptoTemp[0].Replace("=\r\n", "");
-                            var shippto2 = shippto1.Split("<br>");
-                            if (shippto2.Length < 1)
-                            {
-                                continue;
-                            }
-                            email.name = shippto2[0].Trim();
-                            if (email.name.Contains("<span"))
-                            {
-                                email.name = email.name.Split(">")[1].Trim();
-                            }
-                            for (int index = 1; index < shippto2.Length; index++)
-                            {
-                                email.shippto += shippto2[index] + " ";
-
-                            }
-                            if (email.shippto.Contains("</span>"))
-                            {
-                                email.shippto = email.shippto.Replace("</span>", "");
-                            }
-                            if (email.shippto.Contains("</div>"))
-                            {
-                                var temp = email.shippto.Split("</div></td></tr></table>");
-                                if (temp.Length > 0)
-                                {
-                                    email.shippto = temp[0];
-
-                                }
-
-                            }
-                            var tracking1 = tempData.Replace("=\r\n", "");
-
-                            var tracking = tracking1.Split("TRACKING #:");
-                            if (tracking.Length < 2)
-                            {
-                                continue;
-                            }
-                            var tracking2 = tracking[1].Split("</a><br>ORDER DATE");
-                            if (tracking2.Length < 1)
-                            {
-                                continue;
-                            }
-                            var tracking3 = tracking2[0].Split("text-decoration: none;\">");
-                            if (tracking3.Length < 2)
-                            {
-                                continue;
-                            }
-                            email.tracking = tracking3[1];
-                            // Order Total
-                            var orderTotal = finishedTask.Result.data.content.Replace("=\r\n", "");
-                            // item
-                            var item = orderTotal.Split("<td align=3D\"left\" class=3D\"mobile-12\" style=3D\"font-size:0px;padding:0;word-break:break-word;\"><div style=3D\"font-family:Helvetica;font-size:12px;font-weight:700;letter-spacing:0.25;line-height:18px;text-align:left;color:#0A0A0A;\">"); // include link
-                            if (item.Length < 1) continue;
-                            //</ div ></ td ></ tr >< tr >< td
-                            //<div style=3D\"font-family:Helvetica;font-size:12px;font-weight:400;letter-spacing:0.25;line-height:18px;text-align:center;color:#4D4D4D;\">
-                            for (int index = 1; index < item.Length; index++)
-                            {
-                                var itemOD = new Item();
-                                itemOD.MessageId = email.messageId;
-                                itemOD.ODnumber = email.ODNumber;
-                                itemOD.ImageUrl = email.status2;
-                                itemOD.receiveiTime = email.receivedTime;
-                                itemOD.Address = email.address;
-
-                                var odList = item[index].Split("</div></td></tr><tr><td");
-                                if (odList.Length < 1) continue;
-                                itemOD.Name = odList[0];
-                                itemOD.Name.Replace("&amp", "");
-
-                                var qty = item[index].Split("<div style=3D\"font-family:Helvetica;font-size:12px;font-weight:400;letter-spacing:0.25;line-height:18px;text-align:center;color:#4D4D4D;\">");
-                                var qty1 = qty[1].Split("</div></td></tr></table></td></tr></tbody></table></div>")[0];
-                                try
-                                {
-                                    if (qty1 != null) itemOD.Quantity = Int16.Parse(qty1);
-
-                                }
-                                catch (Exception e)
+                                if (tempMail.Length < 2) continue;
+                                var temp = tempMail[1].Split("All rights reserve");
+                                if (temp.Length < 1)
                                 {
                                     continue;
                                 }
-                                _context.Item.Add(itemOD);
-                            }
-                        }
-                        if (email.status.Contains("has been partially shipped"))
-                        {
-                            var tempData1 = tempData.Replace("=\r\n", "");
-
-                            var tracking = tempData1.Split("G #:");
-                            if (tracking.Length < 2)
-                            {
-                                continue;
-                            }
-                            var tracking1 = tracking[1].Split("SHIPMENT");
-                            if (tracking1.Length < 2)
-                            {
-                                continue;
-                            }
-                            var tracking2 = tracking1[0].Replace("=\r\n", "");
-                            var tracking3 = tracking2.Split("style=3D\"color: #000000;\">");
-                            if (tracking3.Length < 2)
-                            {
-                                continue;
-                            }
-                            var tracking4 = tracking3[1].Replace("</a><br /> <span", "");
-                            email.tracking = tracking4;
-
-                            // shipto
-                            var shipto = tempData1.Split("<b>SHIP TO:</b>");
-                            if (shipto.Length < 2) continue;
-
-                            var shipto1 = shipto[1].Split("</span></span></td>");
-                            if (shipto1.Length < 2) continue;
-                            var shipto2 = shipto1[0].Split("#000000;\">");
-                            if (shipto2.Length < 2) continue;
-                            var shipto3 = shipto2[1].Split("<br />");
-                            if (shipto3.Length < 2) continue;
-                            email.name = shipto3[0].Trim();
-                            for (int index = 1; index < shipto3.Length; index++)
-                            {
-                                email.shippto += shipto3[index];
-                            }
-                            //if (oderUpdateLinkTrack != null)
-                            //{
-                            //    oderUpdateLinkTrack.LinkTrack = oderUpdateLinkTrack.LinkTrack + tracking4;
-                            //    _context.DataDauVao.Update(oderUpdateLinkTrack);
-                            //}
-                            // order total                      
-                            var orderTotal = finishedTask.Result.data.content.Replace("=\r\n", "");
-                            var oderTotal1 = orderTotal.Split("SHIPMENT ORDER TOTAL:</span>");
-                            if (oderTotal1.Length < 2) continue;
-                            var oderTotal2 = oderTotal1[1].Split("<br />");
-                            if (oderTotal2.Length < 2) continue;
-                            var oderTotal3 = oderTotal2[0].Replace("=2E", ".");
-                            email.orderTotal = oderTotal3;
-                            // item
-                            var item = orderTotal.Split("<td align=3D\"center\" width=3D\"200\"><a"); // include link
-                            if (item.Length < 1) continue;
-                            for (int index = 1; index < item.Length; index++)
-                            {
-                                var itemOD = new Item();
-                                itemOD.MessageId = email.messageId;
-                                itemOD.ODnumber = email.ODNumber;
-                                itemOD.ImageUrl = email.status2;
-                                itemOD.receiveiTime = email.receivedTime;
-                                itemOD.Address = email.address;
-
-                                var odList = item[index].Split("target=3D\"_blank\">");
-                                if (odList.Length < 1) continue;
-                                string[] stringArray = new string[odList.Length - 2];
-
-                                for (int odIndex = 2; odIndex < odList.Length; odIndex++)
+                                var temp1 = Regex.Split(temp[0], "<a .?>(.*?)</a>");
+                                if (temp1.Length < 1)
                                 {
-                                    var odItem = odList[odIndex].Split("</a></span></td>");
-                                    stringArray[odIndex - 2] = odItem[0];
+                                    continue;
                                 }
-                                itemOD.Name = stringArray[0] + " ";
-                                if (!stringArray[1].Contains("ITEM")) itemOD.Name += stringArray[1];
-                                itemOD.Name.Replace("&amp", "");
-
-                                for (int j = 2; j < stringArray.Length; j++)
+                                var shippto6 = temp1[0].Replace("=\r\n", "");
+                                var shippto3 = shippto6.Split("color:#CCCCCC;\">");
+                                if (shippto3.Length < 2)
                                 {
-                                    var prop = stringArray[j];
-                                    if (prop.Contains("ITEM")) itemOD.ItemCd = prop;
-                                    //if (prop.Contains("Price"))
-                                    //{
-                                    //    itemOD.Price = stringArray[j + 1].Replace("=2E", "");
-                                    //}
-                                    if (prop.Contains("$")) itemOD.Price = prop.Replace("=2E", ".");
+                                    //var shippto3 = temp1[0].Split("color:#CCCCCC;\"=\r\n>");
+                                    continue;
+                                }
+                                var shippto4 = shippto3[1].Split("</a>");
+                                if (shippto4.Length < 1)
+                                {
+                                    continue;
+                                }
+                                var shippto5 = shippto4[0].Replace("=\r\n", "");
+                                email.address = shippto5;
+                            }
+                            // linkTrack
 
-                                    //if (prop.Contains("SIZE")) itemOD.Name += " " + prop;
+                            if (email.status.Contains("confirm"))
+                            {
+                                var shippto = task.data.content.Split("<b>SHIP TO</b><b>:</b>");
+                                if (shippto.Length < 2)
+                                {
+                                    continue;
+                                }
+                                var shippto2 = shippto[1].Split("<br />\r\n\t");
+                                if (shippto2.Length < 1)
+                                {
+                                    continue;
+                                }
+                                var shippto3 = shippto2[0].Replace("=\r\n", "");
+                                if (shippto3 == null)
+                                {
+                                    continue;
+                                }
+                                var shippto4 = shippto3.Split("<br />");
+                                if (shippto4.Length < 1)
+                                {
+                                    continue;
+                                }
+                                email.name = shippto4[0].Replace("<br>", "").Trim();
+                                if (email.name.Contains("<span"))
+                                {
+                                    email.name = email.name.Split(">")[1].Trim();
+                                }
+                                if (shippto.Length > 0)
+                                {
+                                    for (int index = 1; index < shippto.Length; index++)
+                                    {
+                                        email.shippto += shippto[index];
+
+                                    }
+                                }
+                                email.shippto = shippto4[1] + shippto4[2];
+                                // Order Total
+                                var orderTotal = task.data.content.Replace("=\r\n", "");
+                                var estimateTime = orderTotal.Split("Estimated Delivery Date:</b>");
+                                if (estimateTime.Length > 1)
+                                {
+                                    var estimateTime1 = estimateTime[1].Split("\r\n</span></td>\r\n</tr>\r\n");
+                                    var estimateTime2 = estimateTime1[0].Trim();
                                     try
                                     {
-                                        if (prop.Contains("Qty")) itemOD.Quantity = Int16.Parse(prop.Replace("Qty: ", ""));
+                                        DateTime dt = DateTime.Parse(estimateTime2, CultureInfo.InvariantCulture);
+                                        email.estimateDilivery = dt;
+
+                                        //TimeSpan epoch = (dt - new DateTime(1970, 1, 1, 0, 0, 0, 0).ToLocalTime());
+                                        //var unixTimestamp = (double)epoch.TotalMilliseconds;
+                                        //email.estimateDilivery = unixTimestamp.ToString();
+                                    }
+                                    catch (Exception e)
+                                    {
+                                        //no estimateDilivery
+                                    }
+                                }
+                                var oderTotal1 = orderTotal.Split("Gift Card:");
+                                if (oderTotal1.Length < 2) continue;
+                                var oderTotal2 = oderTotal1[1].Split("<br /> </td>");
+                                if (oderTotal2.Length < 2) continue;
+                                var oderTotal3 = oderTotal2[0].Replace("=2E", ".");
+                                email.orderTotal = oderTotal3;
+                                // item
+                                var item = orderTotal.Split("<td align=3D\"center\" width=3D\"200\"><a"); // include link
+                                if (item.Length < 1) continue;
+                                for (int index = 1; index < item.Length; index++)
+                                {
+                                    var itemOD = new Item();
+                                    itemOD.MessageId = email.messageId;
+                                    itemOD.ODnumber = email.ODNumber;
+                                    itemOD.ImageUrl = email.status2;
+                                    itemOD.receiveiTime = email.receivedTime;
+                                    itemOD.Address = email.address;
+                                    var odList = item[index].Split("target=3D\"_blank\">");
+                                    if (odList.Length < 1) continue;
+                                    string[] stringArray = new string[odList.Length - 2];
+
+                                    for (int odIndex = 2; odIndex < odList.Length; odIndex++)
+                                    {
+                                        var odItem = odList[odIndex].Split("</a></span></td>");
+                                        stringArray[odIndex - 2] = odItem[0];
+                                    }
+                                    itemOD.Name = stringArray[0] + " ";
+                                    if (!stringArray[1].Contains("ITEM")) itemOD.Name += stringArray[1];
+                                    itemOD.Name.Replace("&amp", "");
+                                    for (int j = 2; j < stringArray.Length; j++)
+                                    {
+                                        var prop = stringArray[j];
+                                        if (prop.Contains("ITEM")) itemOD.ItemCd = prop;
+                                        //if (prop.Contains("Price")) {
+                                        //    itemOD.Price = stringArray[j + 1].Replace("=2E","");                                   
+                                        //}
+                                        if (prop.Contains("$")) itemOD.Price = prop.Replace("=2E", ".");
+
+                                        //if (prop.Contains("SIZE")) itemOD.Name += " "+ prop;
+                                        try
+                                        {
+                                            if (prop.Contains("Qty")) itemOD.Quantity = Int16.Parse(prop.Replace("Qty: ", ""));
+
+                                        }
+                                        catch (Exception e)
+                                        {
+                                            itemOD.Quantity = Int16.Parse(prop.Replace("Qty:", ""));
+                                        }
+                                    }
+                                    _context.Item.Add(itemOD);
+                                }
+                            }
+                            if (email.status.Contains("has been shipped"))
+                            {
+                                var shipto = task.data.content.Split("SHIP TO:</b><br />");
+                                if (shipto.Length < 1)
+                                {
+                                    continue;
+                                }
+                                var shipto2 = Regex.Split(shipto[1], @"<span.*?>(.*?)<\\/span>");
+                                shipto = shipto2[0].Split("</span></span></td>");
+                                var shiptotemp = shipto[0].Replace("<span=\r\n style=3D\"color: #000000;\">", "");
+                                var shippto3 = shiptotemp.Replace("=\r\n", "");
+                                var shippto4 = shippto3.Split("<br />");
+                                if (shippto4.Length < 1)
+                                {
+                                    continue;
+                                }
+                                email.name = shippto4[0].Trim();
+                                if (email.name.Contains("<span"))
+                                {
+                                    email.name = email.name.Split(">")[1].Trim();
+                                }
+                                for (int index = 1; index < shippto4.Length; index++)
+                                {
+                                    email.shippto += shippto4[index] + " ";
+
+                                }
+
+                                var tracking = tempData.Split("G #:");
+                                if (tracking.Length < 2)
+                                {
+                                    continue;
+                                }
+                                var tracking1 = tracking[1].Split("SHIPMENT");
+                                if (tracking1.Length < 2)
+                                {
+                                    continue;
+                                }
+                                var tracking2 = tracking1[0].Replace("=\r\n", "");
+                                var tracking3 = tracking2.Split("style=3D\"color: #000000;\">");
+                                if (tracking3.Length < 2)
+                                {
+                                    continue;
+                                }
+                                var tracking4 = tracking3[1].Replace("</a><br /> <span", "");
+                                email.tracking = tracking4;
+                                // order total                      
+                                var orderTotal = task.data.content.Replace("=\r\n", "");
+                                var oderTotal1 = orderTotal.Split("SHIPMENT ORDER TOTAL:</span>");
+                                if (oderTotal1.Length < 2) continue;
+                                var oderTotal2 = oderTotal1[1].Split("<br />");
+                                if (oderTotal2.Length < 2) continue;
+                                var oderTotal3 = oderTotal2[0].Replace("=2E", ".");
+                                email.orderTotal = oderTotal3;
+                                // item
+                                var item = orderTotal.Split("<td align=3D\"center\" width=3D\"200\"><a"); // include link
+                                if (item.Length < 1) continue;
+                                for (int index = 1; index < item.Length; index++)
+                                {
+                                    var itemOD = new Item();
+                                    itemOD.MessageId = email.messageId;
+                                    itemOD.ODnumber = email.ODNumber;
+                                    itemOD.ImageUrl = email.status2;
+                                    itemOD.receiveiTime = email.receivedTime;
+                                    itemOD.Address = email.address;
+
+                                    var odList = item[index].Split("target=3D\"_blank\">");
+                                    if (odList.Length < 1) continue;
+                                    string[] stringArray = new string[odList.Length - 2];
+
+                                    for (int odIndex = 2; odIndex < odList.Length; odIndex++)
+                                    {
+                                        var odItem = odList[odIndex].Split("</a></span></td>");
+                                        stringArray[odIndex - 2] = odItem[0];
+                                    }
+                                    itemOD.Name = stringArray[0];
+
+                                    if (!stringArray[1].Contains("ITEM")) itemOD.Name += " " + stringArray[1];
+                                    itemOD.Name.Replace("&amp", "");
+
+                                    for (int j = 2; j < stringArray.Length; j++)
+                                    {
+                                        var prop = stringArray[j];
+                                        if (prop.Contains("<")) continue;
+                                        if (prop.Contains("ITEM")) itemOD.ItemCd = prop;
+                                        //if(prop.Contains(""))
+                                        //if (prop.Contains("Price"))
+                                        //{
+                                        //    itemOD.Price = stringArray[j + 1].Replace("=2E", "");
+                                        //}
+                                        if (prop.Contains("$"))
+                                        {
+                                            itemOD.Price = prop.Replace("=2E", ".");
+                                        }
+                                        //if (prop.Contains("SIZE")) itemOD.Name += " "+prop;
+                                        try
+                                        {
+                                            if (prop.Contains("Qty")) itemOD.Quantity = Int16.Parse(prop.Replace("Qty: ", ""));
+
+                                        }
+                                        catch (Exception e)
+                                        {
+                                            itemOD.Quantity = Int16.Parse(prop.Replace("Qty:", ""));
+                                        }
+                                    }
+                                    _context.Item.Add(itemOD);
+                                }
+
+                            }
+
+                            if (email.status.Contains("is almost here!"))
+                            {
+                                var tempD = finishedTask.Result.data.content.Replace("=\r\n", "");
+                                var shipto = tempD.Split("<b>SHIP TO:</b>");
+                                if (shipto.Length < 2)
+                                {
+
+                                    shipto = finishedTask.Result.data.content.Split("<b>SHIP=\r\n TO:</b>");
+
+                                }
+                                if (shipto.Length < 2)
+                                {
+                                    email.shippto = "shipto Split error";
+                                }
+                                var shiptoTemp = shipto[1].Split("<br></span></div></td><");
+                                if (shiptoTemp.Length < 1)
+                                {
+                                    continue;
+                                }
+                                var shippto1 = shiptoTemp[0].Replace("=\r\n", "");
+                                var shippto2 = shippto1.Split("<br>");
+                                if (shippto2.Length < 1)
+                                {
+                                    continue;
+                                }
+                                email.name = shippto2[0].Trim();
+                                if (email.name.Contains("<span"))
+                                {
+                                    email.name = email.name.Split(">")[1].Trim();
+                                }
+                                for (int index = 1; index < shippto2.Length; index++)
+                                {
+                                    email.shippto += shippto2[index] + " ";
+
+                                }
+                                if (email.shippto.Contains("</span>"))
+                                {
+                                    email.shippto = email.shippto.Replace("</span>", "");
+                                }
+                                if (email.shippto.Contains("</div>"))
+                                {
+                                    var temp = email.shippto.Split("</div></td></tr></table>");
+                                    if (temp.Length > 0)
+                                    {
+                                        email.shippto = temp[0];
+
+                                    }
+
+                                }
+                                var tracking1 = tempData.Replace("=\r\n", "");
+
+                                var tracking = tracking1.Split("TRACKING #:");
+                                if (tracking.Length < 2)
+                                {
+                                    continue;
+                                }
+                                var tracking2 = tracking[1].Split("</a><br>ORDER DATE");
+                                if (tracking2.Length < 1)
+                                {
+                                    continue;
+                                }
+                                var tracking3 = tracking2[0].Split("text-decoration: none;\">");
+                                if (tracking3.Length < 2)
+                                {
+                                    continue;
+                                }
+                                email.tracking = tracking3[1];
+                                // Order Total
+                                var orderTotal = finishedTask.Result.data.content.Replace("=\r\n", "");
+                                // item
+                                var item = orderTotal.Split("<td align=3D\"left\" class=3D\"mobile-12\" style=3D\"font-size:0px;padding:0;word-break:break-word;\"><div style=3D\"font-family:Helvetica;font-size:12px;font-weight:700;letter-spacing:0.25;line-height:18px;text-align:left;color:#0A0A0A;\">"); // include link
+                                if (item.Length < 1) continue;
+                                //</ div ></ td ></ tr >< tr >< td
+                                //<div style=3D\"font-family:Helvetica;font-size:12px;font-weight:400;letter-spacing:0.25;line-height:18px;text-align:center;color:#4D4D4D;\">
+                                for (int index = 1; index < item.Length; index++)
+                                {
+                                    var itemOD = new Item();
+                                    itemOD.MessageId = email.messageId;
+                                    itemOD.ODnumber = email.ODNumber;
+                                    itemOD.ImageUrl = email.status2;
+                                    itemOD.receiveiTime = email.receivedTime;
+                                    itemOD.Address = email.address;
+
+                                    var odList = item[index].Split("</div></td></tr><tr><td");
+                                    if (odList.Length < 1) continue;
+                                    itemOD.Name = odList[0];
+                                    itemOD.Name.Replace("&amp", "");
+
+                                    var qty = item[index].Split("<div style=3D\"font-family:Helvetica;font-size:12px;font-weight:400;letter-spacing:0.25;line-height:18px;text-align:center;color:#4D4D4D;\">");
+                                    var qty1 = qty[1].Split("</div></td></tr></table></td></tr></tbody></table></div>")[0];
+                                    try
+                                    {
+                                        if (qty1 != null) itemOD.Quantity = Int16.Parse(qty1);
 
                                     }
                                     catch (Exception e)
                                     {
-                                        itemOD.Quantity = Int16.Parse(prop.Replace("Qty:", ""));
+                                        continue;
                                     }
+                                    _context.Item.Add(itemOD);
                                 }
-                                _context.Item.Add(itemOD);
+                            }
+                            if (email.status.Contains("has been partially shipped"))
+                            {
+                                var tempData1 = tempData.Replace("=\r\n", "");
+
+                                var tracking = tempData1.Split("G #:");
+                                if (tracking.Length < 2)
+                                {
+                                    continue;
+                                }
+                                var tracking1 = tracking[1].Split("SHIPMENT");
+                                if (tracking1.Length < 2)
+                                {
+                                    continue;
+                                }
+                                var tracking2 = tracking1[0].Replace("=\r\n", "");
+                                var tracking3 = tracking2.Split("style=3D\"color: #000000;\">");
+                                if (tracking3.Length < 2)
+                                {
+                                    continue;
+                                }
+                                var tracking4 = tracking3[1].Replace("</a><br /> <span", "");
+                                email.tracking = tracking4;
+
+                                // shipto
+                                var shipto = tempData1.Split("<b>SHIP TO:</b>");
+                                if (shipto.Length < 2) continue;
+
+                                var shipto1 = shipto[1].Split("</span></span></td>");
+                                if (shipto1.Length < 2) continue;
+                                var shipto2 = shipto1[0].Split("#000000;\">");
+                                if (shipto2.Length < 2) continue;
+                                var shipto3 = shipto2[1].Split("<br />");
+                                if (shipto3.Length < 2) continue;
+                                email.name = shipto3[0].Trim();
+                                for (int index = 1; index < shipto3.Length; index++)
+                                {
+                                    email.shippto += shipto3[index];
+                                }
+                                //if (oderUpdateLinkTrack != null)
+                                //{
+                                //    oderUpdateLinkTrack.LinkTrack = oderUpdateLinkTrack.LinkTrack + tracking4;
+                                //    _context.DataDauVao.Update(oderUpdateLinkTrack);
+                                //}
+                                // order total                      
+                                var orderTotal = finishedTask.Result.data.content.Replace("=\r\n", "");
+                                var oderTotal1 = orderTotal.Split("SHIPMENT ORDER TOTAL:</span>");
+                                if (oderTotal1.Length < 2) continue;
+                                var oderTotal2 = oderTotal1[1].Split("<br />");
+                                if (oderTotal2.Length < 2) continue;
+                                var oderTotal3 = oderTotal2[0].Replace("=2E", ".");
+                                email.orderTotal = oderTotal3;
+                                // item
+                                var item = orderTotal.Split("<td align=3D\"center\" width=3D\"200\"><a"); // include link
+                                if (item.Length < 1) continue;
+                                for (int index = 1; index < item.Length; index++)
+                                {
+                                    var itemOD = new Item();
+                                    itemOD.MessageId = email.messageId;
+                                    itemOD.ODnumber = email.ODNumber;
+                                    itemOD.ImageUrl = email.status2;
+                                    itemOD.receiveiTime = email.receivedTime;
+                                    itemOD.Address = email.address;
+
+                                    var odList = item[index].Split("target=3D\"_blank\">");
+                                    if (odList.Length < 1) continue;
+                                    string[] stringArray = new string[odList.Length - 2];
+
+                                    for (int odIndex = 2; odIndex < odList.Length; odIndex++)
+                                    {
+                                        var odItem = odList[odIndex].Split("</a></span></td>");
+                                        stringArray[odIndex - 2] = odItem[0];
+                                    }
+                                    itemOD.Name = stringArray[0] + " ";
+                                    if (!stringArray[1].Contains("ITEM")) itemOD.Name += stringArray[1];
+                                    itemOD.Name.Replace("&amp", "");
+
+                                    for (int j = 2; j < stringArray.Length; j++)
+                                    {
+                                        var prop = stringArray[j];
+                                        if (prop.Contains("ITEM")) itemOD.ItemCd = prop;
+                                        //if (prop.Contains("Price"))
+                                        //{
+                                        //    itemOD.Price = stringArray[j + 1].Replace("=2E", "");
+                                        //}
+                                        if (prop.Contains("$")) itemOD.Price = prop.Replace("=2E", ".");
+
+                                        //if (prop.Contains("SIZE")) itemOD.Name += " " + prop;
+                                        try
+                                        {
+                                            if (prop.Contains("Qty")) itemOD.Quantity = Int16.Parse(prop.Replace("Qty: ", ""));
+
+                                        }
+                                        catch (Exception e)
+                                        {
+                                            itemOD.Quantity = Int16.Parse(prop.Replace("Qty:", ""));
+                                        }
+                                    }
+                                    _context.Item.Add(itemOD);
+                                }
+                            }
+                            if (email.status2 != null)
+                            {
+                                _context.EmailReader.Add(email);
+
                             }
                         }
-                        if (email.status2 != null)
-                        {
-                            _context.EmailReader.Update(email);
-
-                        }
                     }
+                    downloadTasks.Remove(finishedTask);
+
                 }
-               
+                catch (Exception e)
+                {
+
+                }
+                
+
             }
             _context.SaveChanges();
             UpdateEmailOrder();
@@ -1075,76 +1158,11 @@ namespace WebDeApplication.Controllers
             {
                 _context.DashboardData.Add(dataDashBoard);
             }
+            _context.SaveChanges();
         }
         public async Task<EmailContent> ProcessUrlAsync(MailData mail, OauthZohoResponse receivied)
         {
-            EmailContent content = await GetEmailContent(mail.messageId, receivied);
-            var email = new EmailReader();
-
-            string[] splitString = Regex.Split(mail.subject, @"#");
-            string[] digits = new string[] { };
-            string[] digitStatus = new string[] { };
-            //var oderUpdateLinkTrack = new DataDauVao();
-
-            if (splitString.Length > 1)
-            {
-                digits = Regex.Split(splitString[1], @"\D+");
-                digitStatus = Regex.Split(splitString[1], @"\s");
-            }
-
-            var status = "";
-            if (digitStatus.Length > 1)
-            {
-
-                for (int index = 1; index < digitStatus.Length; index++)
-                {
-                    status += digitStatus[index] + " ";
-
-                }
-            }
-            email.ODNumber = !String.IsNullOrEmpty(digits[0]) ? digits[0] : "";
-            email.status = String.IsNullOrEmpty(status) ? "confirm" : status;
-            if (!String.IsNullOrEmpty(status))
-            {
-                email.status = status;
-            }
-            email.address = "";
-            if (email.status.Contains("has been shipped")) email.status2 = "2";         
-            if (email.status.Contains("is almost here!"))  email.status2 = "3";
-
-            if (email.status.Contains("confirm"))  email.status2 = "1";
-
-            if (email.status.Contains("has been partially shipped")) email.status2 = "0";
-
-            if (email.status.Contains("has been cancelled"))
-            {
-                email.status2 = "-1";
-                email.priority = "cancel";
-            }
-
-            email.ccAddress = mail.ccAddress;
-            //email.estimateDilivery = "";
-            email.folderId = mail.folderId;
-            email.fromAddress = mail.fromAddress;
-            email.Id = 0;
-            email.messageId = mail.messageId;
-            email.hasInline = mail.hasInline;
-            email.summary = mail.summary;
-            email.toAddress = mail.toAddress.Replace("@lt;", "").Replace("&gt;", "");
-            email.shippto = "";
-            email.sender = "";
-            email.subject = mail.subject;
-            email.orderDate = "";
-            email.orderTotal = "";
-            email.priority = "";
-            email.receivedTime = mail.receivedTime;
-            //todo
-            email.receivedTimeLong = long.Parse(mail.receivedTime);
-            email.sentDateInGMT = mail.sentDateInGMT;
-
-            _context.EmailReader.Add(email);
-            _context.SaveChanges();
-            return content;
+            return await GetEmailContent(mail.messageId, receivied);        
         }
         public async Task<IActionResult> ReadEmailAction(string code)
         {
@@ -1166,7 +1184,8 @@ namespace WebDeApplication.Controllers
   
                 //if (mailData.Count == 0) RedirectToAction(nameof(ReadEmail));
                 var totalDem = 0;
-                for (int i = mailData.Count - 1; i >= 0; --i)
+                //mailData.Count - 1
+                for (int i = 200; i >= 0; --i)
                 {
                     var mail = mailData[i];
                     string[] splitString = Regex.Split(mail.subject, @"#");
@@ -1922,24 +1941,24 @@ namespace WebDeApplication.Controllers
                         {
                             total = offset * a * c;
                         }
-                    }                           
-                        //}
+                    }
+                    //}
                     //);
-                    //var totalNet = 0D;
-                    //_context.EmailGroup.Where(e => e.ODParrent == d.Id && (e.shipped == true || e.status2 != "1")).ToList().ForEach(
-                    //    oderItem =>
-                    //    {
-                    //        float a;
-                    //        if (d.TongUSD != null)
-                    //        {
-                    //            var b = float.TryParse(d.TongUSD, out a);
-                    //            if (b)
-                    //            {
-                    //                totalNet = totalNet + (offset * a);
-                    //            }
-                    //        }
-                    //    }
-                    //);
+                    var totalNet = 0D;
+                    _context.EmailGroup.Where(e => e.ODParrent == d.Id && (e.shipped == true || e.status2 != "1")).ToList().ForEach(
+                        oderItem =>
+                        {
+                            float e;
+                            if (d.TongUSD != null)
+                            {
+                                var b = float.TryParse(d.TongUSD, out e);
+                                if (b)
+                                {
+                                    totalNet = totalNet + (offset * e);
+                                }
+                            }
+                        }
+                    );
 
                     var data = new DataProfitOrder();
                     data.ODnumber = d.ODNumber;
@@ -1956,7 +1975,7 @@ namespace WebDeApplication.Controllers
                     data.CanMua = d.CanMua;
                     data.orderStop = d.stopOrder;
                     data.OrderId = d.Id;
-                    //data.NetProfit = totalNet;
+                    data.NetProfit = totalNet;
 
                     if (_context.DataProfitOrder.Any(dt => dt.OrderId == d.Id))
                     {
@@ -1976,7 +1995,7 @@ namespace WebDeApplication.Controllers
                         dprofit.CanMua = d.CanMua;
                         dprofit.orderStop = d.stopOrder;
                         //dprofit.OrderId = d.Id;
-                        //dprofit.NetProfit = totalNet;
+                        dprofit.NetProfit = totalNet;
 
                         _context.DataProfitOrder.Update(dprofit);
 
@@ -2089,8 +2108,8 @@ namespace WebDeApplication.Controllers
                 // TODO: CHANGES ACCESS_TOKEN
                 requestMessage.Headers.Authorization = new AuthenticationHeaderValue("Bearer", receivied.access_token);
                 //Uri.EscapeUriString(requestMessage.RequestUri);
-                var client = _clientFactory.CreateClient();
 
+                var client = _clientFactory.CreateClient();
                 var res = await client.SendAsync(requestMessage);
                 if (res.IsSuccessStatusCode)
                 {
@@ -2102,7 +2121,7 @@ namespace WebDeApplication.Controllers
                     using (var httpClient = new HttpClient())
                     {
                         receivied = await OauthRefreshToken(httpClient, receivied);
-                        if (receivied.access_token == null) return null;
+                        if (receivied.access_token == null) return data;
                         return await GetEmailContent(messageID, receivied);
                     }
                 }
@@ -2115,6 +2134,7 @@ namespace WebDeApplication.Controllers
             int index = 1;
             int defaultLimited = 200;
             bool isReaded = false;
+            var client = _clientFactory.CreateClient();
 
 
             List<MailData> mails = new List<MailData>();
@@ -2132,7 +2152,6 @@ namespace WebDeApplication.Controllers
                 // TODO: CHANGES ACCESS_TOKEN
                 requestMessage.Headers.Authorization = new AuthenticationHeaderValue("Bearer", received.access_token);
 
-                var client = _clientFactory.CreateClient();
 
                 var res = await client.SendAsync(requestMessage);
                 if (res.IsSuccessStatusCode)
@@ -2162,7 +2181,7 @@ namespace WebDeApplication.Controllers
      
             }
             while (isReaded == false);
-
+            client.Dispose();
             return mails;
         }
         private async Task<List<MailData>> GetEmail(OauthZohoResponse received)
@@ -2397,9 +2416,12 @@ namespace WebDeApplication.Controllers
             int dayFn;
             int monthFn;
             int yearFn;
-
+            var userName = User.FindFirstValue(ClaimTypes.Name);
+            var userRole = User.FindFirstValue(ClaimTypes.Role);
+          
+            //dataDauVao.Name = userId;
             var joinning = (from d in _context.DataDauVao
-                                //join email in _context.EmailReader on d.ODNumber equals email.ODNumber
+                            //join email in _context.EmailReader on d.ODNumber equals email.ODNumber
                             orderby d.NgayGui descending
                             select new EmailReaderViewModel
                             {
@@ -2429,7 +2451,10 @@ namespace WebDeApplication.Controllers
                                 Size = d.Size,
                                 Id = d.Id
                             }).ToList();
-
+            if (!userRole.Equals("Admin"))
+            {
+                joinning = joinning.Where(d => d.Name.Equals(userName)).ToList();
+            }
             if (!String.IsNullOrEmpty(Day))
             {
                 dayFn = Int32.Parse(Day);
@@ -2603,7 +2628,22 @@ namespace WebDeApplication.Controllers
                                 total = offset * a * c;
                             }
                         }
-                       
+                        var totalNet = 0D;
+                        _context.EmailGroup.Where(e => e.ODParrent == d.Id && (e.shipped == true || e.status2 != "1")).ToList().ForEach(
+                            oderItem =>
+                            {
+                                float e;
+                                if (d.TongUSD != null)
+                                {
+                                    var b = float.TryParse(d.TongUSD, out e);
+                                    if (b)
+                                    {
+                                        totalNet = totalNet + (offset * e);
+                                    }
+                                }
+                            }
+                        );
+
 
                         var data = new DataProfitOrder();
                         data.ODnumber = d.ODNumber;
@@ -2620,7 +2660,7 @@ namespace WebDeApplication.Controllers
                         data.CanMua = d.CanMua;
                         data.orderStop = d.stopOrder;
                         data.OrderId = d.Id;
-                        //data.NetProfit = totalNet;
+                        data.NetProfit = totalNet;
 
                         if (_context.DataProfitOrder.Any(dt => dt.OrderId == d.Id))
                         {
@@ -2640,7 +2680,7 @@ namespace WebDeApplication.Controllers
                             dprofit.CanMua = d.CanMua;
                             dprofit.orderStop = d.stopOrder;
                             //dprofit.OrderId = d.Id;
-                            //dprofit.NetProfit = totalNet;
+                            dprofit.NetProfit = totalNet;
 
                             _context.DataProfitOrder.Update(dprofit);
 

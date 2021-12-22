@@ -36,10 +36,10 @@ namespace WebDeApplication.Controllers
                 var user = new IdentityUser { UserName = model.UserName, Email = model.Email,  };
                 //var result = await userManager.CreateAsync(user);
                 var result = await userManager.CreateAsync(user, model.Password);
-                
-
+          
                 if (result.Succeeded)
                 {
+                    userManager.AddToRoleAsync(user, "User").Wait();
                     await signInManager.SignInAsync(user, isPersistent: false);
                     return RedirectToAction("Index", "Home");
                 }

@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace WebDeApplication.Migrations
 {
-    public partial class UpdateOder : Migration
+    public partial class UpdateDb : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -55,8 +55,8 @@ namespace WebDeApplication.Migrations
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
                     Year = table.Column<int>(nullable: false),
                     Month = table.Column<int>(nullable: false),
-                    TotalProfit = table.Column<float>(nullable: false),
-                    PercentProfit = table.Column<float>(nullable: false),
+                    TotalProfit = table.Column<double>(nullable: false),
+                    PercentProfit = table.Column<double>(nullable: false),
                     TotalOrder = table.Column<int>(nullable: false),
                     PercentOrder = table.Column<float>(nullable: false),
                     TotalCancel = table.Column<int>(nullable: false),
@@ -82,7 +82,7 @@ namespace WebDeApplication.Migrations
                     LinkSanPham = table.Column<string>(nullable: true),
                     Mau = table.Column<string>(nullable: true),
                     Size = table.Column<string>(nullable: true),
-                    CanMua = table.Column<string>(nullable: true),
+                    CanMua = table.Column<string>(nullable: false),
                     DaMua = table.Column<string>(nullable: true),
                     GiaUSD = table.Column<string>(nullable: true),
                     GiaSale = table.Column<string>(nullable: true),
@@ -91,7 +91,7 @@ namespace WebDeApplication.Migrations
                     Rate = table.Column<string>(nullable: true),
                     TongVND = table.Column<string>(nullable: true),
                     GhiChu = table.Column<string>(nullable: true),
-                    ODNumber = table.Column<string>(nullable: true),
+                    ODNumber = table.Column<string>(nullable: false),
                     ItemInTrack = table.Column<string>(nullable: true),
                     LinkTrack = table.Column<string>(nullable: true),
                     Payment = table.Column<string>(nullable: true),
@@ -101,6 +101,7 @@ namespace WebDeApplication.Migrations
                     isChecked = table.Column<bool>(nullable: false),
                     stopOrder = table.Column<bool>(nullable: false),
                     CreateDate = table.Column<long>(nullable: false),
+                    CreateDateFD = table.Column<DateTime>(nullable: false),
                     tyGiaMua = table.Column<int>(nullable: false),
                     tyGiaBan = table.Column<int>(nullable: false)
                 },
@@ -115,10 +116,11 @@ namespace WebDeApplication.Migrations
                 {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                    OrderId = table.Column<int>(nullable: false),
                     ODnumber = table.Column<string>(nullable: true),
                     Name = table.Column<string>(nullable: true),
                     NgayGui = table.Column<string>(nullable: true),
-                    TotalProfit = table.Column<float>(nullable: false),
+                    TotalProfit = table.Column<double>(nullable: false),
                     SiteName = table.Column<string>(nullable: true),
                     tyGiaMua = table.Column<int>(nullable: false),
                     tyGiaBan = table.Column<int>(nullable: false),
@@ -127,7 +129,8 @@ namespace WebDeApplication.Migrations
                     GiaUSD = table.Column<string>(nullable: true),
                     orderStop = table.Column<bool>(nullable: false),
                     GiaSale = table.Column<string>(nullable: true),
-                    TongUSD = table.Column<string>(nullable: true)
+                    TongUSD = table.Column<string>(nullable: true),
+                    NetProfit = table.Column<double>(nullable: false)
                 },
                 constraints: table =>
                 {
@@ -141,12 +144,12 @@ namespace WebDeApplication.Migrations
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
                     ODNumber = table.Column<string>(nullable: true),
-                    ODParrent = table.Column<string>(nullable: true),
+                    ODParrent = table.Column<int>(nullable: true),
                     Status = table.Column<string>(nullable: true),
                     Name = table.Column<string>(nullable: true),
                     Shippto = table.Column<string>(nullable: true),
-                    Month = table.Column<int>(nullable: false),
-                    Year = table.Column<int>(nullable: false)
+                    ReceivedTimeFD = table.Column<DateTime>(nullable: false),
+                    ReceivedTime = table.Column<string>(nullable: true)
                 },
                 constraints: table =>
                 {
@@ -159,10 +162,11 @@ namespace WebDeApplication.Migrations
                 {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    EmailId = table.Column<int>(nullable: false),
+                    EmailGroupId = table.Column<int>(nullable: false),
                     ODNumber = table.Column<string>(nullable: true),
-                    ODParrent = table.Column<string>(nullable: true),
+                    ODParrent = table.Column<int>(nullable: true),
                     receivedTime = table.Column<string>(nullable: true),
+                    MessageId = table.Column<string>(nullable: true),
                     fromAddress = table.Column<string>(nullable: true),
                     status = table.Column<string>(nullable: true),
                     shippto = table.Column<string>(nullable: true),
@@ -183,18 +187,20 @@ namespace WebDeApplication.Migrations
                 {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    EmailId = table.Column<int>(nullable: false),
+                    EmailReaderId = table.Column<int>(nullable: false),
                     ODNumber = table.Column<string>(nullable: true),
-                    ODParrent = table.Column<string>(nullable: true),
+                    ODParrent = table.Column<int>(nullable: true),
                     toAddress = table.Column<string>(nullable: true),
                     receivedTime = table.Column<string>(nullable: true),
                     fromAddress = table.Column<string>(nullable: true),
                     status = table.Column<string>(nullable: true),
+                    status2 = table.Column<string>(nullable: true),
                     address = table.Column<string>(nullable: true),
                     shippto = table.Column<string>(nullable: true),
                     tracking = table.Column<string>(nullable: true),
                     name = table.Column<string>(nullable: true),
                     orderTotal = table.Column<string>(nullable: true),
+                    MessageId = table.Column<string>(nullable: true),
                     received = table.Column<DateTime>(nullable: false),
                     shipped = table.Column<bool>(nullable: false),
                     estimatime = table.Column<DateTime>(nullable: false)
@@ -228,13 +234,13 @@ namespace WebDeApplication.Migrations
                     status2 = table.Column<string>(nullable: true),
                     isChecked = table.Column<bool>(nullable: false),
                     orderDate = table.Column<string>(nullable: true),
-                    estimateDilivery = table.Column<string>(nullable: true),
+                    estimateDilivery = table.Column<DateTime>(nullable: false),
                     address = table.Column<string>(nullable: true),
                     shippto = table.Column<string>(nullable: true),
                     tracking = table.Column<string>(nullable: true),
                     name = table.Column<string>(nullable: true),
                     orderTotal = table.Column<string>(nullable: true),
-                    odParrent = table.Column<string>(nullable: true),
+                    odParrent = table.Column<int>(nullable: true, defaultValue: 0),
                     shipped = table.Column<bool>(nullable: false)
                 },
                 constraints: table =>
@@ -408,6 +414,16 @@ namespace WebDeApplication.Migrations
                 column: "NormalizedUserName",
                 unique: true,
                 filter: "[NormalizedUserName] IS NOT NULL");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_EmailReader_messageId",
+                table: "EmailReader",
+                column: "messageId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_EmailReader_ODNumber_status2",
+                table: "EmailReader",
+                columns: new[] { "ODNumber", "status2" });
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)

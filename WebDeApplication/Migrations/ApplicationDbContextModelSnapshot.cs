@@ -226,6 +226,8 @@ namespace WebDeApplication.Migrations
 
                     b.Property<long>("CreateDate");
 
+                    b.Property<DateTime>("CreateDateFD");
+
                     b.Property<string>("DaMua");
 
                     b.Property<string>("Debt");
@@ -331,7 +333,7 @@ namespace WebDeApplication.Migrations
 
                     b.Property<string>("ODNumber");
 
-                    b.Property<string>("ODParrent");
+                    b.Property<int?>("ODParrent");
 
                     b.Property<string>("ReceivedTime");
 
@@ -358,7 +360,7 @@ namespace WebDeApplication.Migrations
 
                     b.Property<string>("ODNumber");
 
-                    b.Property<string>("ODParrent");
+                    b.Property<int?>("ODParrent");
 
                     b.Property<DateTime>("estimatime");
 
@@ -395,7 +397,7 @@ namespace WebDeApplication.Migrations
 
                     b.Property<string>("ODNumber");
 
-                    b.Property<string>("ODParrent");
+                    b.Property<int?>("ODParrent");
 
                     b.Property<string>("address");
 
@@ -454,7 +456,9 @@ namespace WebDeApplication.Migrations
 
                     b.Property<string>("name");
 
-                    b.Property<string>("odParrent");
+                    b.Property<int?>("odParrent")
+                        .ValueGeneratedOnAdd()
+                        .HasDefaultValue(0);
 
                     b.Property<string>("orderDate");
 
@@ -487,6 +491,8 @@ namespace WebDeApplication.Migrations
                     b.Property<string>("tracking");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("messageId");
 
                     b.HasIndex("ODNumber", "status2");
 

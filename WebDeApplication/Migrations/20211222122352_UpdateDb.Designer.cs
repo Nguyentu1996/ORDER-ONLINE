@@ -10,8 +10,8 @@ using WebDeApplication.Models.Data;
 namespace WebDeApplication.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20211218062810_updateDb")]
-    partial class updateDb
+    [Migration("20211222122352_UpdateDb")]
+    partial class UpdateDb
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -196,7 +196,7 @@ namespace WebDeApplication.Migrations
 
                     b.Property<float>("PercentOrder");
 
-                    b.Property<float>("PercentProfit");
+                    b.Property<double>("PercentProfit");
 
                     b.Property<string>("SiteName");
 
@@ -206,7 +206,7 @@ namespace WebDeApplication.Migrations
 
                     b.Property<int>("TotalOrder");
 
-                    b.Property<float>("TotalProfit");
+                    b.Property<double>("TotalProfit");
 
                     b.Property<int>("Year");
 
@@ -223,9 +223,12 @@ namespace WebDeApplication.Migrations
 
                     b.Property<string>("Adress");
 
-                    b.Property<string>("CanMua");
+                    b.Property<string>("CanMua")
+                        .IsRequired();
 
                     b.Property<long>("CreateDate");
+
+                    b.Property<DateTime>("CreateDateFD");
 
                     b.Property<string>("DaMua");
 
@@ -251,7 +254,8 @@ namespace WebDeApplication.Migrations
 
                     b.Property<string>("NgayGui");
 
-                    b.Property<string>("ODNumber");
+                    b.Property<string>("ODNumber")
+                        .IsRequired();
 
                     b.Property<string>("Payment");
 
@@ -296,15 +300,19 @@ namespace WebDeApplication.Migrations
 
                     b.Property<string>("Name");
 
+                    b.Property<double>("NetProfit");
+
                     b.Property<string>("NgayGui");
 
                     b.Property<string>("ODnumber");
+
+                    b.Property<int>("OrderId");
 
                     b.Property<string>("SiteName");
 
                     b.Property<string>("TongUSD");
 
-                    b.Property<float>("TotalProfit");
+                    b.Property<double>("TotalProfit");
 
                     b.Property<bool>("orderStop");
 
@@ -323,19 +331,19 @@ namespace WebDeApplication.Migrations
                         .ValueGeneratedOnAdd()
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<int>("Month");
-
                     b.Property<string>("Name");
 
                     b.Property<string>("ODNumber");
 
-                    b.Property<string>("ODParrent");
+                    b.Property<int?>("ODParrent");
+
+                    b.Property<string>("ReceivedTime");
+
+                    b.Property<DateTime>("ReceivedTimeFD");
 
                     b.Property<string>("Shippto");
 
                     b.Property<string>("Status");
-
-                    b.Property<int>("Year");
 
                     b.HasKey("Id");
 
@@ -348,11 +356,13 @@ namespace WebDeApplication.Migrations
                         .ValueGeneratedOnAdd()
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<int>("EmailId");
+                    b.Property<int>("EmailGroupId");
+
+                    b.Property<string>("MessageId");
 
                     b.Property<string>("ODNumber");
 
-                    b.Property<string>("ODParrent");
+                    b.Property<int?>("ODParrent");
 
                     b.Property<DateTime>("estimatime");
 
@@ -383,11 +393,13 @@ namespace WebDeApplication.Migrations
                         .ValueGeneratedOnAdd()
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<int>("EmailId");
+                    b.Property<int>("EmailReaderId");
+
+                    b.Property<string>("MessageId");
 
                     b.Property<string>("ODNumber");
 
-                    b.Property<string>("ODParrent");
+                    b.Property<int?>("ODParrent");
 
                     b.Property<string>("address");
 
@@ -408,6 +420,8 @@ namespace WebDeApplication.Migrations
                     b.Property<string>("shippto");
 
                     b.Property<string>("status");
+
+                    b.Property<string>("status2");
 
                     b.Property<string>("toAddress");
 
@@ -444,7 +458,9 @@ namespace WebDeApplication.Migrations
 
                     b.Property<string>("name");
 
-                    b.Property<string>("odParrent");
+                    b.Property<int?>("odParrent")
+                        .ValueGeneratedOnAdd()
+                        .HasDefaultValue(0);
 
                     b.Property<string>("orderDate");
 
@@ -477,6 +493,10 @@ namespace WebDeApplication.Migrations
                     b.Property<string>("tracking");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("messageId");
+
+                    b.HasIndex("ODNumber", "status2");
 
                     b.ToTable("EmailReader");
                 });

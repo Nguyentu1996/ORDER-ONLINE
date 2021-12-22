@@ -12,7 +12,7 @@ namespace WebDeApplication.Models
     {
         public int Id { get; set; }
         public string ODNumber { get; set; }
-        public int ODParrent { get; set; }
+        public int? ODParrent { get; set; }
 
         public string Status { get; set; }
 

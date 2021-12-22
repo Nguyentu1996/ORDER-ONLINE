@@ -13,7 +13,7 @@ namespace WebDeApplication.Models
         public int EmailReaderId { get; set; }
 
         public string ODNumber { get; set; }
-        public int ODParrent { get; set; }
+        public int? ODParrent { get; set; }
 
         public string toAddress { get; set; }
         public string receivedTime { get; set; }
