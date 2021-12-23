@@ -15,13 +15,15 @@ namespace WebDeApplication.Models.Data
         }
         public DbSet<DataDauVao> DataDauVao { get; set; }
         public DbSet<DataProfitOrder> DataProfitOrder { get; set; }
-
         public DbSet<EmailReader> EmailReader { get; set; }
         public DbSet<EmailGroup> EmailGroup { get; set; }        
         public DbSet<EmailCancel> EmailCancel { get; set; }
         public DbSet<EmailDelay> EmailDelay { get; set; }
         public DbSet<DashboardData> DashboardData { get; set; }
         public DbSet<Item> Item { get; set; }
+        public DbSet<SubProfitOrder> SubProfitOrder { get; set; }
+
+        
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<EmailReader>()              

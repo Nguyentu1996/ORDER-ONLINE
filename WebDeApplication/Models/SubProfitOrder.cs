@@ -13,7 +13,7 @@ namespace WebDeApplication.Models
         public int OrderId { get; set; }
         public string ODnumber { get; set; }
         public string Name { get; set; }
-        public string DateUpdate { get; set; }
+        public DateTime DateUpdate { get; set; }
         public double TotalProfit { get; set; }
         public double NetProfit { get; set; }
         public int tyGiaMua { get; set; }
@@ -22,6 +22,6 @@ namespace WebDeApplication.Models
         public string GiaSale { get; set; }
         public string TongUSD { get; set; }
         public string GiaUSD { get; set; }
-
+        public int Payed { get; set; }
     }
 }

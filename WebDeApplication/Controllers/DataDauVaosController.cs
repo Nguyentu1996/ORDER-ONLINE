@@ -530,7 +530,7 @@ namespace WebDeApplication.Controllers
                                 DateTime dt = DateTime.Parse(estimateTime2, CultureInfo.InvariantCulture);
                                 email.estimateDilivery = dt;
                             }
-                            catch (Exception e)
+                            catch (Exception)
                             {
                                 //no estimateDilivery
                             }
