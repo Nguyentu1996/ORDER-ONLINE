@@ -33,7 +33,9 @@ namespace WebDeApplication.Models.Data
             modelBuilder.Entity<EmailReader>()
                     .Property(b => b.odParrent)
                     .HasDefaultValue(0);
-
+            modelBuilder.Entity<DataDauVao>()
+               .HasIndex(p => p.Name)
+               .HasFilter(null);
             base.OnModelCreating(modelBuilder);
 
         }
