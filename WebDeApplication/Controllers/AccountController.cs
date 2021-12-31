@@ -39,7 +39,7 @@ namespace WebDeApplication.Controllers
           
                 if (result.Succeeded)
                 {
-                    userManager.AddToRoleAsync(user, "User").Wait();
+                    //userManager.AddToRoleAsync(user, "User").Wait();
                     await signInManager.SignInAsync(user, isPersistent: false);
                     return RedirectToAction("Index", "Home");
                 }

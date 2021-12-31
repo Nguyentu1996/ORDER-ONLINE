@@ -65,31 +65,36 @@
                         <a asp-controller="DashboardDatas" asp-action="Index" class="nav-link"><span class="pcoded-micon"><i class="feather icon-home"></i></span><span class="pcoded-mtext">Dashboard</span></a>
                     </li>
 
-               
+
 
                     <li class="nav-item pcoded-hasmenu">
                         <a href="#!" class="nav-link"><span class="pcoded-micon"><i class="feather icon-box"></i></span><span class="pcoded-mtext">Quản Lý Order</span></a>
-                        <ul class="pcoded-submenu">
-                            <li class=""><a asp-controller="DataDauVaos" asp-action="ReadEmail" class="">Cập Nhật Email</a></li>
-                        </ul>
+                        @if (User.Identity.IsAuthenticated && User.IsInRole("Admin"))
+                        {
+                            <ul class="pcoded-submenu">
+                                <li class=""><a asp-controller="DataDauVaos" asp-action="ReadEmail" class="">Cập Nhật Email</a></li>
+                            </ul>
+                        }
+                        
                         <ul class="pcoded-submenu">
                             <li class=""><a asp-controller="DataDauVaos" asp-action="Index" class="">Đơn Hàng</a></li>
                         </ul>
                         @*<ul class="pcoded-submenu">
-                            <li class=""><a asp-controller="DataDauVaos" asp-action="Create" class="">Tạo Đơn Hàng</a></li>
-                        </ul>*@
+                <li class=""><a asp-controller="DataDauVaos" asp-action="Create" class="">Tạo Đơn Hàng</a></li>
+            </ul>*@
                         <ul class="pcoded-submenu">
                             <li class=""><a asp-controller="DataDauVaos" asp-action="TotalItem" class="">Thống Kê Item</a></li>
                         </ul>
-                    </li>
-
-                    @if (User.Identity.IsAuthenticated && User.IsInRole("Admin")) { 
-                        <li class="nav-item">
-                            <a asp-controller="Administration" asp-action="ListRole" class="nav-link"><span class="pcoded-micon"><i class="feather icon-settings"></i></span><span class="pcoded-mtext">Quản Lý Account</span></a>
                         </li>
-                    }
-                    @*</li>*@
-                </ul>
+
+                        @if (User.Identity.IsAuthenticated && User.IsInRole("Admin"))
+                        {
+                            <li class="nav-item">
+                                <a asp-controller="Administration" asp-action="ListRole" class="nav-link"><span class="pcoded-micon"><i class="feather icon-settings"></i></span><span class="pcoded-mtext">Quản Lý Account</span></a>
+                            </li>
+                        }
+                        @*</li>*@
+                    </ul>
 
 
             </div>

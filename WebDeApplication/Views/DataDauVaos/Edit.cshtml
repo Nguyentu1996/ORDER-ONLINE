@@ -18,8 +18,26 @@
                         <div class="col-md-3">
                             <div class="form-group">
                                 <label asp-for="Name" class="control-label"></label>
-                                <input asp-for="Name" class="form-control datepicker"  />
+                                <input asp-for="Name" class="form-control datepicker" />
                                 <span asp-validation-for="Name" class="text-danger"></span>
+                            </div>
+                            <div class="form-group hidden">
+                                <label asp-for="NetProfit" class="control-label"></label>
+                                <input asp-for="NetProfit" class="form-control datepicker" />
+                                <span asp-validation-for="NetProfit" class="text-danger"></span>
+                            </div> <div class="form-group hidden">
+                                <label asp-for="CreateDateFD" class="control-label"></label>
+                                <input asp-for="CreateDateFD" class="form-control datepicker" />
+                                <span asp-validation-for="CreateDateFD" class="text-danger"></span>
+                            </div> <div class="form-group hidden">
+                                <label asp-for="CreateDate" class="control-label"></label>
+                                <input asp-for="CreateDate" class="form-control datepicker" />
+                                <span asp-validation-for="CreateDate" class="text-danger"></span>
+                            </div>
+                            <div class="form-group hidden">
+                                <label asp-for="TotalProfit" class="control-label"></label>
+                                <input asp-for="TotalProfit" class="form-control datepicker" />
+                                <span asp-validation-for="TotalProfit" class="text-danger"></span>
                             </div>
                             <div class="form-group">
                                 <label asp-for="Adress" class="control-label"></label>

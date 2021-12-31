@@ -16,8 +16,8 @@ namespace WebDeApplication.Models
         public DateTime DateUpdate { get; set; }
         public double TotalProfit { get; set; }
         public double NetProfit { get; set; }
-        public int tyGiaMua { get; set; }
-        public int tyGiaBan { get; set; }
+        public double tyGiaMua { get; set; }
+        public double tyGiaBan { get; set; }
         public Boolean orderStop { get; set; }
         public string GiaSale { get; set; }
         public string TongUSD { get; set; }

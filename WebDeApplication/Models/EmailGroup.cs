@@ -31,6 +31,8 @@ namespace WebDeApplication.Models
         public DateTime received { get; set; }
         public Boolean shipped { get; set; }
         public DateTime estimatime { get; set; }
+        public Boolean isCheck { get; set; }
+        public int subProfitId { get; set; }
 
     }
 }

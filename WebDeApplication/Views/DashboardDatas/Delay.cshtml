@@ -149,7 +149,7 @@
                                         @Html.DisplayNameFor(model => model.estimatime)
                                     </th>
                                     <th>
-                                        Shipped
+                                        Ship
 
                                     </th>
                                     <th>
@@ -167,51 +167,56 @@
                                             { "page",  Context.Request.Query["page"].ToString() },
                                             { "id", item.Id.ToString() },
                                         };
-                                    <tr id="tr_@item.Id">
-                                        <td>
-                                            @* <a class="pointer-events" onclick="location.href = '@(Url.Action("Details", "DataDauVaos", new { id = item.Id }))'">*@
-                                            @Html.DisplayFor(modelItem => item.ODNumber)
-                                            @*</a>*@
-                                        </td>
-                                        <td>
-                                            @Html.DisplayFor(modelItem => item.name)
-                                        </td>
+                                <tr id="tr_@item.Id">
+                                    <td>
+                                        @* <a class="pointer-events" onclick="location.href = '@(Url.Action("Details", "DataDauVaos", new { id = item.Id }))'">*@
+                                        @Html.DisplayFor(modelItem => item.ODNumber)
+                                        @*</a>*@
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.name)
+                                    </td>
 
 
-                                        <td>
-                                            @Html.DisplayFor(modelItem => item.fromAddress)
-                                        </td>
-                                        <td>
-                                            @Html.DisplayFor(modelItem => item.status)
-                                        </td>
-                                        <td>
-                                            @Html.DisplayFor(modelItem => item.shippto)
-                                        </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.fromAddress)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.status)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.shippto)
+                                    </td>
 
-                                        <td>
-                                            @Html.DisplayFor(modelItem => item.orderTotal)
-                                        </td>
-                                        <td>
-                                            @Html.DisplayFor(modelItem => item.receivedTime)
-                                        </td>
-                                        <td>
-                                            @Html.DisplayFor(modelItem => item.estimatime)
-                                        </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.orderTotal)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.receivedTime)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.estimatime)
+                                    </td>
 
-                                        <td>
-                                            <a asp-controller="DashboardDatas" asp-action="Shipped" asp-all-route-data="param">Shipped</a>
-                                        </td>
-                                        <td>
+                                   
+                                    <td>
+                                       
+                                            <a asp-controller="DashboardDatas" asp-action="Shipped" asp-all-route-data="param">Ship</a>
 
-                                            @*<a onclick="location.href='/DataDauVaos/Details/?id='+@item.Id+''" href="javascript:void()"> Detail </a>
-                                                ||  <a onclick="location.href='/DataDauVaos/Edit/?id='+@item.Id+''" href="javascript:void()"> Edit </a>
-                                                ||  <a href="javascript:void()" onclick="DeletePage(@item.Id,'id=@item.Id','/DataDauVaos/Ajax_delete_data')"> Delete </a>*@
-                                            @*<a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                                                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                                                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>*@
 
-                                        </td>
-                                    </tr>
+                                    </td>
+                                   
+                                    <td>
+
+                                        @*<a onclick="location.href='/DataDauVaos/Details/?id='+@item.Id+''" href="javascript:void()"> Detail </a>
+            ||  <a onclick="location.href='/DataDauVaos/Edit/?id='+@item.Id+''" href="javascript:void()"> Edit </a>
+            ||  <a href="javascript:void()" onclick="DeletePage(@item.Id,'id=@item.Id','/DataDauVaos/Ajax_delete_data')"> Delete </a>*@
+                                        @*<a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+            <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
+            <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>*@
+
+                                    </td>
+                                </tr>
 
                                 }
                             </tbody>

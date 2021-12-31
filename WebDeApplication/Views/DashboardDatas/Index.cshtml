@@ -6,7 +6,7 @@
     var format = System.Globalization.CultureInfo.GetCultureInfo("vi-VN");
     //var duration = @Model.TotalOrder - @Model.TotalDelay;
 }
-
+@*<h1>@ViewData["Time"]</h1>*@
 <div class="row">
 
     <!-- product profit start -->
@@ -18,7 +18,7 @@
                 <div class="row align-items-center m-b-25">
                     <div class="col">
                         <h6 class="m-b-5 text-white">LỢI NHUẬN</h6>
-                        <h3 class="m-b-0 text-white"> @(Model != null ? String.Format(format, "{0:c0}", Model.TotalProfit) : "")</h3>
+                        <h3 class="m-b-0 text-white"> @String.Format(format, "{0:c0}", ViewData["TotalProfit"])</h3>
                     </div>
                     <div class="col-auto">
                         <i class="fas fa-dollar-sign text-c-green f-18"></i>
@@ -35,7 +35,7 @@
                 <div class="row align-items-center m-b-25">
                     <div class="col">
                         <h6 class="m-b-5 text-white">TỔNG ĐƠN ORDER</h6>
-                        <h3 class="m-b-0 text-white">@(Model != null ? Model.TotalOrder : 0)</h3>
+                        <h3 class="m-b-0 text-white">@ViewData["TotalOrder"]</h3>
                     </div>
                     <div class="col-auto">
                         <i class="fas fa-database text-c-blue f-18"></i>
@@ -52,7 +52,7 @@
                 <div class="row align-items-center m-b-25">
                     <div class="col">
                         <h6 class="m-b-5 text-white">ĐƠN CANCEL</h6>
-                        <h3 class="m-b-0 text-white">@(Model != null ? Model.TotalCancel : 0)</h3>
+                        <h3 class="m-b-0 text-white">@ViewData["TotalCancel"]</h3>
                     </div>
                     <div class="col-auto">
                         <i class="fas fa-money-bill-alt text-c-red f-18"></i>
@@ -69,7 +69,7 @@
                 <div class="row align-items-center m-b-25">
                     <div class="col">
                         <h6 class="m-b-5 text-white">ĐƠN DELAY</h6>
-                        <h3 class="m-b-0 text-white">@(Model != null ? Model.TotalDelay : 0)</h3>
+                        <h3 class="m-b-0 text-white">@ViewData["TotalDelay"]</h3>
                     </div>
                     <div class="col-auto">
                         <i class="fas fa-tags text-c-yellow f-18"></i>
@@ -89,7 +89,7 @@
                         <img src="~/images/browser/sephora.png" style="height: 50px; width:auto" />
                     </div>
                     <div class="col text-right">
-                        <h3>@(Model != null ? Model.TotalProfit : 0)</h3>
+                        <h3>@String.Format(format, "{0:c0}", ViewData["TotalProfit"])</h3>
                         <h5 class="text-c-blue mb-0">+7.2% <span class="text-muted">Lợi Nhuận</span></h5>
                     </div>
                 </div>
@@ -97,13 +97,13 @@
             <div class="card-block">
                 <div class="row align-items-center justify-content-center card-active">
                     <div class="col-6">
-                        <h6 class="text-center m-b-10"><span class="text-muted m-r-5">Đơn Hàng:</span>@(Model != null ? Model.TotalOrder : 0)</h6>
+                        <h6 class="text-center m-b-10"><span class="text-muted m-r-5">Đơn Hàng:</span>>@ViewData["TotalOrder"]</h6>
                         <div class="progress">
                             <div class="progress-bar progress-c-blue" role="progressbar" style="width:60%;height:6px;" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100"></div>
                         </div>
                     </div>
                     <div class="col-6">
-                        <h6 class="text-center  m-b-10"><span class="text-muted m-r-5">Lợi Nhuận:</span>@(Model != null ? Model.TotalOrder : 0)</h6>
+                        <h6 class="text-center  m-b-10"><span class="text-muted m-r-5">Lợi Nhuận:</span>>@ViewData["TotalOrder"]</h6>
                         <div class="progress">
                             <div class="progress-bar progress-c-green" role="progressbar" style="width:45%;height:6px;" aria-valuenow="45" aria-valuemin="0" aria-valuemax="100"></div>
                         </div>

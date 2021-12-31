@@ -35,5 +35,10 @@ namespace WebDeApplication.Models.ViewModel
         public string Address { get; set; }
         public string Shippto { get; set; }
         public string Name { get; set; }
+        public string UserCreate { get; set; }
+        public double TyGiaBan { get; set; }
+        public double TyGiaMua { get; set; }
+
+
     }
 }

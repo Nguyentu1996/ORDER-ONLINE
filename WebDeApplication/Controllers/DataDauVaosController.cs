@@ -32,6 +32,8 @@ namespace WebDeApplication.Controllers
         private readonly IHttpClientFactory _clientFactory;
         private readonly ApplicationDbContext _context;
         //private List<DataDauVao> data = new List<DataDauVao>();
+        private readonly UserManager<IdentityUser> userManager;
+        private readonly SignInManager<IdentityUser> signInManager;
         private List<EmailReaderViewModel> data = new List<EmailReaderViewModel>();
 
         private readonly string zohoMailUrlOauthV2 = "https://accounts.zoho.com/oauth/v2/token";
@@ -39,15 +41,18 @@ namespace WebDeApplication.Controllers
         private readonly string scope = "ZohoMail.messages.READ";
         private readonly string client_id = "1000.16VT5D5DQ71NQWFD3LNR6DDUD0F8XS";
         private readonly string redirect_uri = "https://localhost:44309/Datadauvaos/Callback";
-        private readonly string zohoMailUrlGetMailFolder = "https://mail.zoho.com/api/accounts/6001458000000008002/messages/view?folderId=6001458000000962001";
+        private readonly string zohoMailUrlGetMailFolder = "https://mail.zoho.com/api/accounts/6001458000000008002/messages/view?folderId=6001458000001642001";
         private readonly string zohoMailUrlSearch = "https://mail.zoho.com/api/accounts/6001458000000008002/messages/search";
         private readonly string zohomailMaskasRead = "https://mail.zoho.com/api/accounts/6001458000000008002/updatemessage";
         private string refreshtoken;
         private Boolean isErrors = false;
-        public DataDauVaosController(ApplicationDbContext context, IHttpClientFactory clientFactory)
+        public DataDauVaosController(ApplicationDbContext context, IHttpClientFactory clientFactory, UserManager<IdentityUser> userManager,
+                                SignInManager<IdentityUser> signInManager)
         {
             _context = context;
             _clientFactory = clientFactory;
+            this.userManager = userManager;
+            this.signInManager = signInManager;
 
         }
         public bool IsDateTime(string text)
@@ -64,6 +69,24 @@ namespace WebDeApplication.Controllers
             isDateTime = DateTime.TryParse(text, out dateTime);
 
             return isDateTime;
+        }
+        public long UnixtimestampVn()
+        {
+            TimeZone time2 = TimeZone.CurrentTimeZone;
+            DateTime test = time2.ToUniversalTime(DateTime.Now);
+            var vietNam = TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time");
+            var vietNameTime = TimeZoneInfo.ConvertTimeFromUtc(test, vietNam);
+            long unixTimestamp = ((DateTimeOffset)vietNameTime).ToUnixTimeMilliseconds();
+            return unixTimestamp;
+        }
+        public DateTime DateTimeVn()
+        {
+            TimeZone time2 = TimeZone.CurrentTimeZone;
+            DateTime test = time2.ToUniversalTime(DateTime.Now);
+            var vietNam = TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time");
+            var vietNameTime = TimeZoneInfo.ConvertTimeFromUtc(test, vietNam);
+            //long unixTimestamp = ((DateTimeOffset)vietNameTime).ToUnixTimeSeconds();
+            return vietNameTime;
         }
         [HttpGet]
         public async Task<IActionResult> TotalItem(string from, string to, string name, int? page = 0)
@@ -109,12 +132,36 @@ namespace WebDeApplication.Controllers
                                   sentDateInGMT = e.sentDateInGMT,
                                   priority = e.receivedTime,
                                   status2 = e.status2,
+                                  odParrent = e.odParrent,
                                   receivedTimeLong = e.receivedTimeLong,
                                   receivedTime = e.receivedTime != null ? new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc).AddMilliseconds(double.Parse(e.receivedTime)).ToLocalTime().ToString("dd-MM-yyyy hh:mm:ss tt") : String.Empty
                               }).Where(e => e.priority != null).OrderByDescending(e => e.priority).ToList();
 
+                var group2 = (from g in group1
+                              join e in _context.DataDauVao on  g.odParrent equals e.Id
+                              where e.UserCreate == User.FindFirstValue(ClaimTypes.Name).ToString()
+                              select new EmailReader
+                              {
+                                  Id = e.Id,
+                                  ODNumber = g.ODNumber,
+                                  address = g.address,
+                                  name = g.name == null ? _context.EmailReader.FirstOrDefault(em => em.ODNumber == e.ODNumber && g.status2 == "2").name : g.name,
+                                  shippto = g.shippto,
+                                  status = g.status,
+                                  summary = g.summary,
+                                  subject = g.subject,
+                                  fromAddress = g.fromAddress,
+                                  toAddress = g.toAddress,
+                                  tracking = g.tracking,
+                                  orderTotal = g.orderTotal,
+                                  sentDateInGMT = g.sentDateInGMT,
+                                  priority = g.receivedTime,
+                                  status2 = g.status2,
+                                  receivedTimeLong = g.receivedTimeLong,
+                                  receivedTime = g.receivedTime,
+                              }).Where(e => e.priority != null).OrderByDescending(e => e.priority).ToList();
 
-                result = (from gr in group1
+                result = (from gr in group2
                           join i in _context.Item
                           on gr.ODNumber equals i.ODnumber
                           where gr.status2 == i.ImageUrl
@@ -141,6 +188,7 @@ namespace WebDeApplication.Controllers
                                    group e by e.ODNumber into g
                                    select new { ODNumber = g.Key, status = g.Where(e => e != null).Max(e => e.status2) }).ToList();
 
+
                 var emails = (from e in _context.EmailReader
                               join g in groupStatus on e.ODNumber equals g.ODNumber
                               where e.status2 != null && (e.status2 == g.status || e.status2 == "0")
@@ -165,7 +213,31 @@ namespace WebDeApplication.Controllers
                                   receivedTime = e.receivedTime != null ? new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc).AddMilliseconds(double.Parse(e.receivedTime)).ToLocalTime().ToString("dd-MM-yyyy hh:mm:ss tt") : String.Empty
                               }).Where(e => e.priority != null).OrderByDescending(e => e.priority).ToList();
 
-                result = (from gr in emails
+                var group2 = (from g in emails
+                              join e in _context.DataDauVao on g.odParrent equals e.Id
+                              where e.UserCreate == User.FindFirstValue(ClaimTypes.Name).ToString()
+                              select new EmailReader
+                              {
+                                  Id = e.Id,
+                                  ODNumber = g.ODNumber,
+                                  address = g.address,
+                                  name = g.name == null ? _context.EmailReader.FirstOrDefault(em => em.ODNumber == e.ODNumber && g.status2 == "2").name : g.name,
+                                  shippto = g.shippto,
+                                  status = g.status,
+                                  summary = g.summary,
+                                  subject = g.subject,
+                                  fromAddress = g.fromAddress,
+                                  toAddress = g.toAddress,
+                                  tracking = g.tracking,
+                                  orderTotal = g.orderTotal,
+                                  sentDateInGMT = g.sentDateInGMT,
+                                  priority = g.receivedTime,
+                                  status2 = g.status2,
+                                  receivedTimeLong = g.receivedTimeLong,
+                                  receivedTime = g.receivedTime,
+                              }).Where(e => e.priority != null).OrderByDescending(e => e.priority).ToList();
+
+                result = (from gr in group2
                           join i in _context.Item
                           on gr.ODNumber equals i.ODnumber
                           where gr.status2 == i.ImageUrl
@@ -228,10 +300,10 @@ namespace WebDeApplication.Controllers
             }
             IList<Item> ListItem = new List<Item>();
 
-            var data = await _context.EmailGroup
+            var data = await _context.EmailReader
                 .FirstOrDefaultAsync(m => m.Id == id);
             //data.receivedTime = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc).AddMilliseconds(double.Parse(data.receivedTime)).ToLocalTime().ToString("dd-MM-yyyy hh:mm:ss tt");
-            ListItem =_context.Item.Where(item => item.MessageId == data.MessageId && item.ImageUrl == data.status2).Select(e => new Item {
+            ListItem =_context.Item.Where(item => item.MessageId == data.messageId && item.ImageUrl == data.status2).Select(e => new Item {
                     Name = e.Name,
                     Price = _context.Item.Where(i => i.ODnumber == e.ODnumber && i.Name.Contains(e.Name) && i.Price != null).Select(it => it.Price).FirstOrDefault(),
                     Quantity = e.Quantity
@@ -249,44 +321,34 @@ namespace WebDeApplication.Controllers
             {
                 return NotFound();
             }
-
-            var emGroup = _context.EmailGroup.Where(e => e.Id == id).FirstOrDefault();
-            emGroup.shipped = true;
-
+          
             var shipped = _context.EmailDelay.Where(e => e.Id == id).FirstOrDefault();
+            var emReader = _context.EmailReader.Where(e => e.Id == id).FirstOrDefault();
+
             if(shipped != null)
             {
                 shipped.shipped = true;
                 _context.EmailDelay.Update(shipped);
+                _context.SaveChanges();
             }
-            _context.EmailGroup.Update(emGroup);
-            _context.SaveChanges();
-            _context.DataDauVao.Where(d => d.stopOrder == false).ToList().ForEach(d =>
+            if ( emReader != null && emReader.shipped == true) return RedirectToAction("Details", new { id = idOrder, page = page });
+
+            if (emReader != null)
             {
+                emReader.shipped = true;
+                _context.EmailReader.Update(emReader);
+                _context.SaveChanges();
+            }
 
-                float offset = d.tyGiaBan - d.tyGiaMua;
-                var totalNet = 0D;
-                _context.EmailGroup.Where(e => e.ODParrent == d.Id && (e.shipped == true || e.status2 != "1")).ToList().ForEach(
-                    oderItem =>
-                    {
-                        float a;
-                        if (d.TongUSD != null)
-                        {
-                            var b = float.TryParse(d.TongUSD, out a);
-                            if (b)
-                            {
-                                totalNet = totalNet + (offset * a);
-                            }
-                        }
-
-                    }
-                );
-
-                var dprofit = _context.DataProfitOrder.Single(dp => dp.ODnumber == d.ODNumber);
-                dprofit.NetProfit = totalNet;
-                _context.DataProfitOrder.Update(dprofit);
-            });
-
+            var order = _context.DataDauVao.Where(d => d.Id == idOrder && d.stopOrder == false).FirstOrDefault();
+            if(order != null)
+            {
+                
+                order.NetProfit = order.NetProfit + ((order.tyGiaBan - order.tyGiaMua) * float.Parse(order.TongUSD));            
+                _context.SaveChanges();
+              
+            }
+            
             return RedirectToAction("Details", new { id = idOrder, page = page });
         }
     
@@ -307,7 +369,36 @@ namespace WebDeApplication.Controllers
                 page = 1;
             }
             start = (int)(page - 1) * limit;
-            var result = _context.EmailGroup.Select(e => e).ToList();
+            //var result = _context.EmailGroup.Select(e => e).ToList();
+            var groupStatus = (from e in _context.EmailReader
+                               where e.ODNumber != null && e.priority != "cancel"
+
+                               group e by e.ODNumber into g
+                               select new { ODNumber = g.Key, status = g.Where(e => e != null).Max(e => e.status2) });
+
+            var result = (from e in _context.EmailReader
+                          join g in groupStatus on e.ODNumber equals g.ODNumber
+                          where e.status2 != null && (e.status2 == g.status || e.status2 == "0")
+                          select new EmailGroup
+                          {
+                              EmailReaderId = e.Id,
+                              ODNumber = e.ODNumber,
+                              address = e.address,
+                              name = (from em in _context.EmailReader where em.ODNumber == e.ODNumber && em.name != null && em.name != "" select em.name).FirstOrDefault(),
+                              shippto = e.shippto,
+                              status = e.status,
+                              status2 = e.status2,
+                              MessageId = e.messageId,
+                              fromAddress = e.fromAddress,
+                              toAddress = e.toAddress,
+                              tracking = _context.EmailReader.Where(rd => rd.ODNumber == e.ODNumber && rd.tracking != null && rd.tracking != "").Select(em => em.tracking).FirstOrDefault(),
+                              orderTotal = _context.EmailReader.Where(rd => rd.ODNumber == e.ODNumber && rd.orderTotal != null && rd.orderTotal != "").Select(em => em.orderTotal).FirstOrDefault(),
+                              received = e.receivedTime != null ? new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc).AddMilliseconds(double.Parse(e.receivedTime)) : DateTime.MinValue,
+                              ODParrent = _context.EmailReader.Where(rd => rd.ODNumber == e.ODNumber && rd.odParrent != 0).Select(em => em.odParrent).FirstOrDefault(),
+                              shipped = e.shipped,
+                              estimatime = _context.EmailReader.Where(em => em.ODNumber == e.ODNumber && em.status2 == "1").Select(em => em.estimateDilivery).FirstOrDefault(),
+                              receivedTime = e.receivedTime != null ? new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc).AddMilliseconds(double.Parse(e.receivedTime)).ToLocalTime().ToString("dd-MM-yyyy hh:mm:ss tt") : String.Empty
+                          }).ToList();
 
             ViewBag.pageCurrent = page;
 
@@ -336,7 +427,7 @@ namespace WebDeApplication.Controllers
 
             received = await getAccessToken(code, received);
             var emails = await GetAllEmail(received);
-            if(emails.Count < 1) return RedirectToAction(nameof(ReadEmail));
+            //if(emails.Count < 1) return RedirectToAction(nameof(ReadEmail));
 
             IEnumerable<Task<EmailContent>> downloadTasksQuery =                 
             emails.Where(m => !_context.EmailReader.Any(e => e.messageId == m.messageId)).Select(e => ProcessUrlAsync(e, received));
@@ -359,7 +450,7 @@ namespace WebDeApplication.Controllers
             _context.SaveChanges();
             UpdateEmailOrder();
             UpdateEmailCancel();
-            UpdateEmailGroup();
+            //UpdateEmailGroup();
             UpdateDashboardData();
             return RedirectToAction(nameof(ReadEmail));
 
@@ -424,7 +515,6 @@ namespace WebDeApplication.Controllers
                 email.subject = mail.subject;
                 email.orderDate = "";
                 email.orderTotal = "";
-                email.priority = "";
                 email.receivedTime = mail.receivedTime;
                 //todo
                 email.receivedTimeLong = long.Parse(mail.receivedTime);
@@ -434,6 +524,8 @@ namespace WebDeApplication.Controllers
                 {
                     if (task.data.content == null) return;
                     var tempData = task.data.content;
+
+                    //var tempData = emailContent.data.content;
 
                     var tempMail = tempData.Split("address");
                     if (tempMail.Length > 1)
@@ -455,7 +547,10 @@ namespace WebDeApplication.Controllers
 
                             }
                         }
-                        if (tempMail.Length < 2) return;
+                        if (tempMail.Length < 2)
+                        {
+                            return;
+                        }
                         var temp = tempMail[1].Split("All rights reserve");
                         if (temp.Length < 1)
                         {
@@ -470,6 +565,7 @@ namespace WebDeApplication.Controllers
                         var shippto3 = shippto6.Split("color:#CCCCCC;\">");
                         if (shippto3.Length < 2)
                         {
+                            //var shippto3 = temp1[0].Split("color:#CCCCCC;\"=\r\n>");
                             return;
                         }
                         var shippto4 = shippto3[1].Split("</a>");
@@ -529,21 +625,39 @@ namespace WebDeApplication.Controllers
                             {
                                 DateTime dt = DateTime.Parse(estimateTime2, CultureInfo.InvariantCulture);
                                 email.estimateDilivery = dt;
+
                             }
-                            catch (Exception)
+                            catch (Exception e)
                             {
                                 //no estimateDilivery
                             }
                         }
                         var oderTotal1 = orderTotal.Split("Gift Card:");
-                        if (oderTotal1.Length < 2) return;
+                        if (oderTotal1.Length < 2)
+                        {
+                            return;
+                        }
                         var oderTotal2 = oderTotal1[1].Split("<br /> </td>");
-                        if (oderTotal2.Length < 2) return;
-                        var oderTotal3 = oderTotal2[0].Replace("=2E", ".");
-                        email.orderTotal = oderTotal3;
+                        if (oderTotal2.Length <= 2)
+                        {
+                            var oderTotalTest = orderTotal.Split("Total:");
+                            var odtotal = oderTotalTest[1].Split("<br /><br /></td>");
+                            var oderTotal3 = odtotal[0].Replace("=2E", ".");
+                            email.orderTotal = oderTotal3;
+                            //continue;
+                        }
+                        if (oderTotal2.Length > 2)
+                        {
+                            var oderTotal3 = oderTotal2[0].Replace("=2E", ".");
+                            email.orderTotal = oderTotal3;
+                        }
+
                         // item
                         var item = orderTotal.Split("<td align=3D\"center\" width=3D\"200\"><a"); // include link
-                        if (item.Length < 1) return;
+                        if (item.Length < 1)
+                        {
+                            return;
+                        }
                         for (int index = 1; index < item.Length; index++)
                         {
                             var itemOD = new Item();
@@ -553,7 +667,10 @@ namespace WebDeApplication.Controllers
                             itemOD.receiveiTime = email.receivedTime;
                             itemOD.Address = email.address;
                             var odList = item[index].Split("target=3D\"_blank\">");
-                            if (odList.Length < 1) continue;
+                            if (odList.Length < 1)
+                            {
+                                continue;
+                            }
                             string[] stringArray = new string[odList.Length - 2];
 
                             for (int odIndex = 2; odIndex < odList.Length; odIndex++)
@@ -568,9 +685,12 @@ namespace WebDeApplication.Controllers
                             {
                                 var prop = stringArray[j];
                                 if (prop.Contains("ITEM")) itemOD.ItemCd = prop;
-
+                                //if (prop.Contains("Price")) {
+                                //    itemOD.Price = stringArray[j + 1].Replace("=2E","");                                   
+                                //}
                                 if (prop.Contains("$")) itemOD.Price = prop.Replace("=2E", ".");
 
+                                //if (prop.Contains("SIZE")) itemOD.Name += " "+ prop;
                                 try
                                 {
                                     if (prop.Contains("Qty")) itemOD.Quantity = Int16.Parse(prop.Replace("Qty: ", ""));
@@ -632,14 +752,23 @@ namespace WebDeApplication.Controllers
                         // order total                      
                         var orderTotal = task.data.content.Replace("=\r\n", "");
                         var oderTotal1 = orderTotal.Split("SHIPMENT ORDER TOTAL:</span>");
-                        if (oderTotal1.Length < 2) return;
+                        if (oderTotal1.Length < 2)
+                        {
+                            return;
+                        }
                         var oderTotal2 = oderTotal1[1].Split("<br />");
-                        if (oderTotal2.Length < 2) return;
+                        if (oderTotal2.Length < 2)
+                        {
+                            return;
+                        }
                         var oderTotal3 = oderTotal2[0].Replace("=2E", ".");
                         email.orderTotal = oderTotal3;
                         // item
                         var item = orderTotal.Split("<td align=3D\"center\" width=3D\"200\"><a"); // include link
-                        if (item.Length < 1) return;
+                        if (item.Length < 1)
+                        {
+                            return;
+                        }
                         for (int index = 1; index < item.Length; index++)
                         {
                             var itemOD = new Item();
@@ -650,7 +779,10 @@ namespace WebDeApplication.Controllers
                             itemOD.Address = email.address;
 
                             var odList = item[index].Split("target=3D\"_blank\">");
-                            if (odList.Length < 1) continue;
+                            if (odList.Length < 1)
+                            {
+                                continue;
+                            }
                             string[] stringArray = new string[odList.Length - 2];
 
                             for (int odIndex = 2; odIndex < odList.Length; odIndex++)
@@ -666,13 +798,21 @@ namespace WebDeApplication.Controllers
                             for (int j = 2; j < stringArray.Length; j++)
                             {
                                 var prop = stringArray[j];
-                                if (prop.Contains("<")) continue;
+                                if (prop.Contains("<"))
+                                {
+                                    continue;
+                                }
                                 if (prop.Contains("ITEM")) itemOD.ItemCd = prop;
-
+                                //if(prop.Contains(""))
+                                //if (prop.Contains("Price"))
+                                //{
+                                //    itemOD.Price = stringArray[j + 1].Replace("=2E", "");
+                                //}
                                 if (prop.Contains("$"))
                                 {
                                     itemOD.Price = prop.Replace("=2E", ".");
                                 }
+                                //if (prop.Contains("SIZE")) itemOD.Name += " "+prop;
                                 try
                                 {
                                     if (prop.Contains("Qty")) itemOD.Quantity = Int16.Parse(prop.Replace("Qty: ", ""));
@@ -760,6 +900,8 @@ namespace WebDeApplication.Controllers
                         // item
                         var item = orderTotal.Split("<td align=3D\"left\" class=3D\"mobile-12\" style=3D\"font-size:0px;padding:0;word-break:break-word;\"><div style=3D\"font-family:Helvetica;font-size:12px;font-weight:700;letter-spacing:0.25;line-height:18px;text-align:left;color:#0A0A0A;\">"); // include link
                         if (item.Length < 1) return;
+                        //</ div ></ td ></ tr >< tr >< td
+                        //<div style=3D\"font-family:Helvetica;font-size:12px;font-weight:400;letter-spacing:0.25;line-height:18px;text-align:center;color:#4D4D4D;\">
                         for (int index = 1; index < item.Length; index++)
                         {
                             var itemOD = new Item();
@@ -813,14 +955,25 @@ namespace WebDeApplication.Controllers
 
                         // shipto
                         var shipto = tempData1.Split("<b>SHIP TO:</b>");
-                        if (shipto.Length < 2) return;
-
+                        if (shipto.Length < 2)
+                        {
+                            return;
+                        }
                         var shipto1 = shipto[1].Split("</span></span></td>");
-                        if (shipto1.Length < 2) return;
+                        if (shipto1.Length < 2)
+                        {
+                            return;
+                        }
                         var shipto2 = shipto1[0].Split("#000000;\">");
-                        if (shipto2.Length < 2) return;
+                        if (shipto2.Length < 2)
+                        {
+                            return;
+                        }
                         var shipto3 = shipto2[1].Split("<br />");
-                        if (shipto3.Length < 2) return;
+                        if (shipto3.Length < 2)
+                        {
+                            return;
+                        }
                         email.name = shipto3[0].Trim();
                         for (int index = 1; index < shipto3.Length; index++)
                         {
@@ -830,14 +983,24 @@ namespace WebDeApplication.Controllers
                         // order total                      
                         var orderTotal = task.data.content.Replace("=\r\n", "");
                         var oderTotal1 = orderTotal.Split("SHIPMENT ORDER TOTAL:</span>");
-                        if (oderTotal1.Length < 2) return;
-                        var oderTotal2 = oderTotal1[1].Split("<br />");
-                        if (oderTotal2.Length < 2) return;
-                        var oderTotal3 = oderTotal2[0].Replace("=2E", ".");
-                        email.orderTotal = oderTotal3;
+                        if (oderTotal1.Length > 2)
+                        {
+                            var oderTotal2 = oderTotal1[1].Split("<br />");
+                            if (oderTotal2.Length > 2)
+                            {
+                                var oderTotal3 = oderTotal2[0].Replace("=2E", ".");
+                                email.orderTotal = oderTotal3;
+
+                            }
+                        }
+
+
                         // item
                         var item = orderTotal.Split("<td align=3D\"center\" width=3D\"200\"><a"); // include link
-                        if (item.Length < 1) return;
+                        if (item.Length < 1)
+                        {
+                            return;
+                        }
                         for (int index = 1; index < item.Length; index++)
                         {
                             var itemOD = new Item();
@@ -848,7 +1011,10 @@ namespace WebDeApplication.Controllers
                             itemOD.Address = email.address;
 
                             var odList = item[index].Split("target=3D\"_blank\">");
-                            if (odList.Length < 1) continue;
+                            if (odList.Length < 1)
+                            {
+                                continue;
+                            }
                             string[] stringArray = new string[odList.Length - 2];
 
                             for (int odIndex = 2; odIndex < odList.Length; odIndex++)
@@ -949,7 +1115,7 @@ namespace WebDeApplication.Controllers
             var deleteEmail = _context.EmailReader.Where(e => e.status2 == "-1").Select(e => e).ToList();
             for (int i = 0; i < deleteEmail.Count; i++)
             {
-                var cancelEmail = _context.EmailReader.Where(e => e.ODNumber == deleteEmail[i].ODNumber && e.status2 == "1" && e.odParrent != 0).FirstOrDefault();
+                var cancelEmail = _context.EmailReader.Where(e => e.ODNumber == deleteEmail[i].ODNumber && e.status2 == "1" ).FirstOrDefault();
                 if (cancelEmail != null)
                 {
                     cancelEmail.priority = "cancel";
@@ -958,8 +1124,9 @@ namespace WebDeApplication.Controllers
                     emailCancel.ODParrent = cancelEmail.odParrent;
                     emailCancel.ODNumber = cancelEmail.ODNumber;
                     emailCancel.Shippto = cancelEmail.shippto;
-                    emailCancel.Status = cancelEmail.status;
+                    emailCancel.Status = deleteEmail[i].status;
                     emailCancel.ReceivedTime = cancelEmail.receivedTime;
+
                     var time = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc).AddMilliseconds(cancelEmail.receivedTimeLong).ToLocalTime();
                     emailCancel.ReceivedTimeFD = time;
 
@@ -976,7 +1143,7 @@ namespace WebDeApplication.Controllers
             // Update email group
             _context.Database.ExecuteSqlCommand("DELETE FROM [EmailGroup]");
             var groupStatus = (from e in _context.EmailReader
-                               where e.ODNumber != null && e.priority != "cancel"
+                               where e.ODNumber != null && e.priority != "cancel" 
                                group e by e.ODNumber into g
                                select new { ODNumber = g.Key, status = g.Where(e => e != null).Max(e => e.status2) });
 
@@ -1004,134 +1171,233 @@ namespace WebDeApplication.Controllers
                               receivedTime = e.receivedTime != null ? new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc).AddMilliseconds(double.Parse(e.receivedTime)).ToLocalTime().ToString("dd-MM-yyyy hh:mm:ss tt") : String.Empty
                           }).ToList();
 
-            _context.EmailGroup.AddRange(result);
+           _context.EmailGroup.AddRange(result);
             _context.SaveChanges();
         }
         public void UpdateDashboardData()
         {
-            var date = DateTime.Now;
-            var dataDashBoard = new DashboardData();
-
-            dataDashBoard.Month = DateTime.Now.Month;
-            dataDashBoard.Year = DateTime.Now.Year;
-            dataDashBoard.SiteName = "Sephora";
-            dataDashBoard.TotalCancel = _context.EmailCancel.Where(e => e.ODParrent != 0).Count();
-
+            var date = DateTimeVn();
+          
             // Email delay        
-            var emailDelays = _context.EmailGroup.Where(e => e.status.Contains("confirm") && e.estimatime <= date && e.ODParrent != 0).Select(e => new EmailDelay
+            var groupStatus = (from e in _context.EmailReader
+                               where e.ODNumber != null && e.priority != "cancel"
+                               group e by e.ODNumber into g
+                               select new { ODNumber = g.Key, status = g.Where(e => e != null).Max(e => e.status2) });
+
+            var result = (from e in _context.EmailReader
+                          join g in groupStatus on e.ODNumber equals g.ODNumber
+                          where e.status2 != null && (e.status2 == g.status || e.status2 == "0")
+                          select new EmailGroup
+                          {
+                              EmailReaderId = e.Id,
+                              ODNumber = e.ODNumber,
+                              address = e.address,
+                              name = e.name,
+                              shippto = e.shippto,
+                              status = e.status,
+                              status2 = e.status2,
+                              MessageId = e.messageId,
+                              fromAddress = e.fromAddress,
+                              toAddress = e.toAddress,
+                              tracking = e.tracking,
+                              orderTotal = _context.EmailReader.Where(rd => rd.ODNumber == e.ODNumber && rd.orderTotal != null && rd.orderTotal != "").Select(em => em.orderTotal).FirstOrDefault(),
+                              received = e.receivedTime != null ? new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc).AddMilliseconds(double.Parse(e.receivedTime)) : DateTime.MinValue,
+                              ODParrent = _context.EmailReader.Where(rd => rd.ODNumber == e.ODNumber && rd.odParrent != 0).Select(em => em.odParrent).FirstOrDefault(),
+                              shipped = e.shipped,
+                              estimatime = e.estimateDilivery,
+                              receivedTime = e.receivedTime,
+                              isCheck = e.isChecked,
+                              subProfitId = _context.EmailReader.Any(rd => rd.ODNumber == e.ODNumber && rd.subProfitId != 0) ? _context.EmailReader.Where(rd => rd.ODNumber == e.ODNumber && rd.subProfitId != 0).Select(em => em.subProfitId).FirstOrDefault(): e.subProfitId,
+                          }).ToList();
+
+            var emailDelays = _context.EmailReader.Where(e => e.status.Contains("confirm") && e.estimateDilivery <= date && e.odParrent != 0).Select(e => new EmailDelay
             {
                 //Id = e.EmailId,
                 tracking = e.tracking,
                 ODNumber = e.ODNumber,
                 name = e.name,
-                ODParrent = e.ODParrent,
+                ODParrent = e.odParrent,
                 shippto = e.shippto,
                 status = e.status,
                 fromAddress = e.fromAddress,
                 receivedTime = e.receivedTime,
                 shipped = e.shipped,
-                estimatime = e.estimatime,
+                estimatime = e.estimateDilivery,
                 orderTotal = e.orderTotal,
-                MessageId = e.MessageId,
+                MessageId = e.messageId,
                 EmailGroupId = e.Id
             }).ToList();
 
             _context.EmailDelay.AddRange(emailDelays);
             _context.SaveChanges();
-            dataDashBoard.TotalDelay = _context.EmailDelay.Where(e => e.shipped == false).Count();
-            // total order
-            var orderItemsCount = _context.EmailGroup.Where(e => e.received.Month == date.Month && e.received.Year == date.Year && e.ODParrent != 0).Count();
-
-
-            dataDashBoard.TotalOrder = _context.EmailGroup.Count();
-            var previosOrder = _context.EmailGroup.Where(e => e.received.Month == date.Month - 1 && e.received.Year == date.Year && e.ODParrent != 0).Count();
-            if (previosOrder != 0)
-            {
-                dataDashBoard.PercentOrder = orderItemsCount * 100 / previosOrder;
-
-            }
-
-            _context.DataDauVao.ToList().ForEach(d => {
-                // profit
-                var total = 0D;
-                var totalPrevios = 0D;
-                float offset = d.tyGiaBan - d.tyGiaMua;
+            ProcessProfit(result);
+            //_context.DataDauVao.Where(d => d.stopOrder == false).ToList().ForEach(d => {
+            //    // profit
+            //    var total = 0D;
+            //    var totalPrevios = 0D;
+            //    double offset = d.tyGiaBan - d.tyGiaMua;
             
-                float a;
-                int c;
-                if (d.TongUSD != null)
+            //    float totalUsdData = 0f;
+            //    int payedData;
+            //    if (d.TongUSD != null)
+            //    {
+            //        var b = float.TryParse(d.TongUSD, out totalUsdData);
+            //        var e = Int32.TryParse(d.DaMua, out payedData);
+            //        if (b && e)
+            //        {
+            //            total = offset * totalUsdData * payedData;
+            //        }
+            //    }
+            //    // profit      
+
+            //    var count = result.Count(e => e.ODParrent == d.Id && e.status2 != "1") + result.Count(e => e.ODParrent == d.Id && e.shipped == true);
+            //    var totalNet = count * offset * totalUsdData;
+            
+            //    if(_context.SubProfitOrder.Any(sub => sub.OrderId == d.Id))
+            //    {
+            //        var subProfit = _context.SubProfitOrder.Where(sub => sub.OrderId == d.Id).OrderByDescending(sub => sub.Id).FirstOrDefault();
+
+            //        int payedInt = 0;
+            //        var totalUsd = 0f;
+
+            //        var payed = Int32.TryParse(d.DaMua, out payedInt);
+            //        var totalSuccess = float.TryParse(subProfit.TongUSD, out totalUsd);
+            //        if (payed && totalSuccess)
+            //        {
+            //            var payNum = payedInt - subProfit.Payed;
+            //            if (payNum > 0)
+            //            {
+            //                subProfit.TotalProfit = (subProfit.tyGiaBan - subProfit.tyGiaMua) * totalUsd * payNum;
+            //                var subCount = result.Where(e => e.ODParrent == d.Id && e.received > subProfit.DateUpdate && (e.shipped == true || e.status2 != "1")).Count();
+            //                subProfit.NetProfit = offset * totalUsd * subCount;
+            //                subProfit.Payed = payedInt;
+            //                subProfit.Id = 0;
+            //                _context.SubProfitOrder.Add(subProfit);
+            //            }
+            //        }
+               
+            //    } else
+            //    {
+            //        d.NetProfit = totalNet;
+            //        d.TotalProfit = total;
+            //    }
+                
+            //});
+            _context.SaveChanges();
+        
+        }
+        public void ProcessProfit(List<EmailGroup> result)
+        {
+            _context.DataDauVao.Where(d => d.stopOrder == false).ToList().ForEach(d => {
+                // profit             
+
+                if (_context.SubProfitOrder.Any(sub => sub.OrderId == d.Id))
                 {
-                    var b = float.TryParse(d.TongUSD, out a);
-                    var e = Int32.TryParse(d.DaMua, out c);
-                    if (b && e)
-                    {
-                        total = offset * a * c;
+
+                    var subList = _context.SubProfitOrder.Where(sub => sub.OrderId == d.Id).ToList();
+                    var index = subList.Count();
+
+                    do {
+                        index--;
+                        proccessSubProfit(d, result, subList[index]);
                     }
-                }           
+                    while (index == 0);
 
-                var data = new DataProfitOrder();
-                data.ODnumber = d.ODNumber;
-                data.Name = d.Name;
-                data.NgayGui = d.NgayGui;
-                data.GiaUSD = d.GiaUSD;
-                data.DaMua = d.DaMua;
-                data.GiaSale = d.GiaSale;
-                data.SiteName = "Sephora";
-                data.TotalProfit = total;
-                data.tyGiaBan = d.tyGiaBan;
-                data.tyGiaMua = d.tyGiaMua;
-                data.DaMua = d.DaMua;
-                data.CanMua = d.CanMua;
-                data.orderStop = d.stopOrder;
-                data.OrderId = d.Id;
-
-                if (_context.DataProfitOrder.Any(dt => dt.OrderId == d.Id))
-                {
-                    var dprofit = _context.DataProfitOrder.Single(dp => dp.OrderId == d.Id);
-                    dprofit.TotalProfit = data.TotalProfit;
-                    dprofit.ODnumber = d.ODNumber;
-                    dprofit.Name = d.Name;
-                    dprofit.NgayGui = d.NgayGui;
-                    dprofit.GiaUSD = d.GiaUSD;
-                    dprofit.DaMua = d.DaMua;
-                    dprofit.GiaSale = d.GiaSale;
-                    dprofit.TotalProfit = total;
-                    dprofit.tyGiaBan = d.tyGiaBan;
-                    dprofit.tyGiaMua = d.tyGiaMua;
-                    dprofit.DaMua = d.DaMua;
-                    dprofit.CanMua = d.CanMua;
-                    dprofit.orderStop = d.stopOrder;
-                    _context.DataProfitOrder.Update(dprofit);
+                    //// todo
+                    var offsetOrder = d.tyGiaBan - d.tyGiaMua;
+                    var totalProfit = 0D;
+                    var netProfit = 0D;
+                    var subProfit = subList.First();
+                  
+                    result.Where(e => e.ODParrent == d.Id && e.subProfitId == 0 && (e.shipped == true || e.status2 != "1") && e.received < subProfit.DateUpdate).ToList().ForEach(e =>
+                    {
+                        float orderTotal = 0f;
+                        var isfloatParse = float.TryParse(e.orderTotal.Split("$")[1].Trim(), out orderTotal);
+                        if (isfloatParse)
+                        {
+                            netProfit += offsetOrder * orderTotal;
+                        }
+                    });
+                    result.Where(e => e.ODParrent == d.Id && e.subProfitId == 0 && e.received < subProfit.DateUpdate).ToList().ForEach(e =>
+                    {
+                        float orderTotal = 0f;
+                        var isfloatParse = float.TryParse(e.orderTotal.Split("$")[1].Trim(), out orderTotal);
+                        if (isfloatParse)
+                        {
+                            totalProfit += offsetOrder * orderTotal;
+                        }
+                        _context.EmailReader.Where(em => em.ODNumber == e.ODNumber).ToList().ForEach(email => email.subProfitId = -1);
+                        _context.SaveChanges();
+                    });
+                    d.TotalProfit = d.TotalProfit + totalProfit;
+                    d.NetProfit = d.NetProfit + netProfit;
+                    _context.DataDauVao.Update(d);
 
                 }
-                else _context.DataProfitOrder.Add(data);
+                else
+                {
+                    var offset = d.tyGiaBan - d.tyGiaMua;
+                    var totalProfit = 0D;
+                    var netProfit = 0D;
+                    result.Where(e => e.ODParrent == d.Id).ToList().ForEach(e =>
+                    {
+                        float orderTotal = 0f;
+                        var isfloatParse = float.TryParse(e.orderTotal.Split("$")[1].Trim(), out orderTotal);
+                        if (isfloatParse)
+                        {
+                            totalProfit += offset * orderTotal;
+                        }
+                        _context.EmailReader.Where(em => em.ODNumber == e.ODNumber).ToList().ForEach(email => email.subProfitId = -1);
+                        _context.SaveChanges();
 
+                    });
+                    result.Where(e => e.ODParrent == d.Id && (e.shipped == true || e.status2 != "1")).ToList().ForEach(e =>
+                    {
+                        float orderTotal = 0f;
+                        var isfloatParse = float.TryParse(e.orderTotal.Split("$")[1].Trim(), out orderTotal);
+                        if (isfloatParse)
+                        {
+                            netProfit += offset * orderTotal;
+                        }
+                    });
+                    d.TotalProfit = totalProfit;
+                    d.NetProfit = netProfit;
+                    // set check all
+                    _context.DataDauVao.Update(d);
+                }
+              
             });
-
-            dataDashBoard.TotalProfit = _context.DataProfitOrder.Sum(ord => ord.TotalProfit);
-           
-            if (_context.DashboardData.Count() > 0)
-            {
-                var data = _context.DashboardData.OrderByDescending(d => d.Id).FirstOrDefault();
-                data.Month = dataDashBoard.Month;
-                data.Year = dataDashBoard.Year;
-                data.PercentCancel = dataDashBoard.PercentCancel;
-                data.PercentDelay = dataDashBoard.PercentDelay;
-                data.PercentOrder = dataDashBoard.PercentOrder;
-                data.PercentProfit = dataDashBoard.PercentProfit;
-                data.TotalCancel = dataDashBoard.TotalCancel;
-                data.TotalDelay = dataDashBoard.TotalDelay;
-                data.TotalOrder = dataDashBoard.TotalOrder;
-                data.TotalProfit = dataDashBoard.TotalProfit;
-                data.SiteName = dataDashBoard.SiteName;
-                _context.DashboardData.Update(data);
-            }
-            else
-            {
-                _context.DashboardData.Add(dataDashBoard);
-            }
             _context.SaveChanges();
         }
+        public async void proccessSubProfit(DataDauVao order, List<EmailGroup> result, SubProfitOrder subProfit)
+        {
+           
+            var offset = subProfit.tyGiaBan - subProfit.tyGiaMua;
+            result.Where(e => e.ODParrent == order.Id && e.subProfitId == 0 && e.received > subProfit.DateUpdate && (e.shipped == true || e.status2 != "1")).ToList().ForEach(e => {
+                float orderTotal = 0f;
+                var isfloatParse = float.TryParse(e.orderTotal.Split("$")[1].Trim(), out orderTotal);
+                if (isfloatParse)
+                {
+                    subProfit.NetProfit += offset * orderTotal;
+                }
+
+            });
+            result.Where(e => e.ODParrent == order.Id && e.subProfitId == 0 && e.received > subProfit.DateUpdate).ToList().ForEach(e => {
+                float orderTotal = 0f;
+                var isfloatParse = float.TryParse(e.orderTotal.Split("$")[1].Trim(), out orderTotal);
+                if (isfloatParse)
+                {
+                    subProfit.TotalProfit += offset * orderTotal;
+                }
+                _context.EmailReader.Where(em => em.ODNumber == e.ODNumber).ToList().ForEach(email => email.subProfitId = subProfit.Id);
+                _context.SaveChanges();
+            });
+            subProfit.Payed = result.Where(e => e.ODParrent == order.Id && e.subProfitId == 0 && e.received > subProfit.DateUpdate).Count();
+            //subProfit.Id = 0;
+            _context.SubProfitOrder.Update(subProfit);
+
+        }
+
         public static Task<Task<T>>[] Interleaved<T>(IEnumerable<Task<T>> tasks)
         {
             var inputTasks = tasks.ToList();
@@ -1181,7 +1447,7 @@ namespace WebDeApplication.Controllers
                 //if (mailData.Count == 0) RedirectToAction(nameof(ReadEmail));
                 var totalDem = 0;
                 //mailData.Count - 1
-                for (int i = 200; i >= 0; --i)
+                for (int i = mailData.Count - 1; i >= 0; --i)
                 {
                     var mail = mailData[i];
                     string[] splitString = Regex.Split(mail.subject, @"#");
@@ -1266,7 +1532,10 @@ namespace WebDeApplication.Controllers
 
                     }
                     var messID = _context.EmailReader.FirstOrDefault(e => e.messageId == mail.messageId);
-                    if (messID != null) continue;
+                    if (messID != null)
+                    {
+                        continue;
+                    }
                     EmailContent emailContent = await GetEmailContent(mail.messageId, received);
                     if(emailContent == null)
                     {
@@ -1276,7 +1545,10 @@ namespace WebDeApplication.Controllers
                             emailContent = await GetEmailContent(mail.messageId, received);
                         }
                     }
-                    if (emailContent.data == null) continue;
+                    if (emailContent.data == null)
+                    {
+                        continue;
+                    }
                     var tempData = emailContent.data.content;
 
                     var tempMail = tempData.Split("address");
@@ -1299,7 +1571,10 @@ namespace WebDeApplication.Controllers
 
                             }
                         }
-                        if (tempMail.Length < 2) continue;
+                        if (tempMail.Length < 2)
+                        {
+                            continue;
+                        }
                         var temp = tempMail[1].Split("All rights reserve");
                         if (temp.Length < 1)
                         {
@@ -1374,10 +1649,7 @@ namespace WebDeApplication.Controllers
                             {
                                 DateTime dt = DateTime.Parse(estimateTime2, CultureInfo.InvariantCulture);
                                 email.estimateDilivery = dt;
-
-                                //TimeSpan epoch = (dt - new DateTime(1970, 1, 1, 0, 0, 0, 0).ToLocalTime());
-                                //var unixTimestamp = (double)epoch.TotalMilliseconds;
-                                //email.estimateDilivery = unixTimestamp.ToString();
+                            
                             }
                             catch (Exception e)
                             {
@@ -1385,14 +1657,31 @@ namespace WebDeApplication.Controllers
                             }
                         }
                         var oderTotal1 = orderTotal.Split("Gift Card:");
-                        if (oderTotal1.Length < 2) continue;
+                        if (oderTotal1.Length < 2)
+                        {
+                            continue;
+                        }
                         var oderTotal2 = oderTotal1[1].Split("<br /> </td>");
-                        if (oderTotal2.Length < 2) continue;
-                        var oderTotal3 = oderTotal2[0].Replace("=2E", ".");
-                        email.orderTotal = oderTotal3;
+                        if (oderTotal2.Length <= 2)
+                        {
+                            var oderTotalTest = orderTotal.Split("Total:");
+                            var odtotal = oderTotalTest[1].Split("<br /><br /></td>");
+                            var oderTotal3 = odtotal[0].Replace("=2E", ".");
+                            email.orderTotal = oderTotal3;
+                            //continue;
+                        }
+                        if (oderTotal2.Length > 2)
+                        {
+                            var oderTotal3 = oderTotal2[0].Replace("=2E", ".");
+                            email.orderTotal = oderTotal3;
+                        }
+                      
                         // item
                         var item = orderTotal.Split("<td align=3D\"center\" width=3D\"200\"><a"); // include link
-                        if (item.Length < 1) continue;
+                        if (item.Length < 1)
+                        {
+                            continue;
+                        }
                         for (int index = 1; index < item.Length; index++)
                         {
                             var itemOD = new Item();
@@ -1402,7 +1691,10 @@ namespace WebDeApplication.Controllers
                             itemOD.receiveiTime = email.receivedTime;
                             itemOD.Address = email.address;
                             var odList = item[index].Split("target=3D\"_blank\">");
-                            if (odList.Length < 1) continue;
+                            if (odList.Length < 1)
+                            {
+                                continue;
+                            }
                             string[] stringArray = new string[odList.Length - 2];
 
                             for (int odIndex = 2; odIndex < odList.Length; odIndex++)
@@ -1484,14 +1776,23 @@ namespace WebDeApplication.Controllers
                         // order total                      
                         var orderTotal = emailContent.data.content.Replace("=\r\n", "");
                         var oderTotal1 = orderTotal.Split("SHIPMENT ORDER TOTAL:</span>");
-                        if (oderTotal1.Length < 2) continue;
+                        if (oderTotal1.Length < 2)
+                        {
+                            continue;
+                        }
                         var oderTotal2 = oderTotal1[1].Split("<br />");
-                        if (oderTotal2.Length < 2) continue;
+                        if (oderTotal2.Length < 2)
+                        {
+                            continue;
+                        }
                         var oderTotal3 = oderTotal2[0].Replace("=2E", ".");
                         email.orderTotal = oderTotal3;
                         // item
                         var item = orderTotal.Split("<td align=3D\"center\" width=3D\"200\"><a"); // include link
-                        if (item.Length < 1) continue;
+                        if (item.Length < 1)
+                        {
+                            continue;
+                        }
                         for (int index = 1; index < item.Length; index++)
                         {
                             var itemOD = new Item();
@@ -1502,7 +1803,10 @@ namespace WebDeApplication.Controllers
                             itemOD.Address = email.address;
 
                             var odList = item[index].Split("target=3D\"_blank\">");
-                            if (odList.Length < 1) continue;
+                            if (odList.Length < 1)
+                            {
+                                continue;
+                            }
                             string[] stringArray = new string[odList.Length - 2];
 
                             for (int odIndex = 2; odIndex < odList.Length; odIndex++)
@@ -1518,7 +1822,10 @@ namespace WebDeApplication.Controllers
                             for (int j = 2; j < stringArray.Length; j++)
                             {
                                 var prop = stringArray[j];
-                                if (prop.Contains("<")) continue;
+                                if (prop.Contains("<"))
+                                {
+                                    continue;
+                                }
                                 if (prop.Contains("ITEM")) itemOD.ItemCd = prop;
                                 //if(prop.Contains(""))
                                 //if (prop.Contains("Price"))
@@ -1672,35 +1979,52 @@ namespace WebDeApplication.Controllers
 
                         // shipto
                         var shipto = tempData1.Split("<b>SHIP TO:</b>");
-                        if (shipto.Length < 2) continue;
-
+                        if (shipto.Length < 2)
+                        {
+                            continue;
+                        }
                         var shipto1 = shipto[1].Split("</span></span></td>");
-                        if (shipto1.Length < 2) continue;
+                        if (shipto1.Length < 2)
+                        {
+                            continue;
+                        }
                         var shipto2 = shipto1[0].Split("#000000;\">");
-                        if (shipto2.Length < 2) continue;
+                        if (shipto2.Length < 2)
+                        {
+                            continue;
+                        }
                         var shipto3 = shipto2[1].Split("<br />");
-                        if (shipto3.Length < 2) continue;
+                        if (shipto3.Length < 2)
+                        {
+                            continue;
+                        }
                         email.name = shipto3[0].Trim();
                         for (int index = 1; index < shipto3.Length; index++)
                         {
                             email.shippto += shipto3[index];
                         }
-                        //if (oderUpdateLinkTrack != null)
-                        //{
-                        //    oderUpdateLinkTrack.LinkTrack = oderUpdateLinkTrack.LinkTrack + tracking4;
-                        //    _context.DataDauVao.Update(oderUpdateLinkTrack);
-                        //}
+                     
                         // order total                      
                         var orderTotal = emailContent.data.content.Replace("=\r\n", "");
                         var oderTotal1 = orderTotal.Split("SHIPMENT ORDER TOTAL:</span>");
-                        if (oderTotal1.Length < 2) continue;
-                        var oderTotal2 = oderTotal1[1].Split("<br />");
-                        if (oderTotal2.Length < 2) continue;
-                        var oderTotal3 = oderTotal2[0].Replace("=2E", ".");
-                        email.orderTotal = oderTotal3;
+                        if (oderTotal1.Length > 2)
+                        {
+                            var oderTotal2 = oderTotal1[1].Split("<br />");
+                            if (oderTotal2.Length > 2)
+                            {
+                                var oderTotal3 = oderTotal2[0].Replace("=2E", ".");
+                                email.orderTotal = oderTotal3;
+
+                            }
+                        }
+                        
+                        
                         // item
                         var item = orderTotal.Split("<td align=3D\"center\" width=3D\"200\"><a"); // include link
-                        if (item.Length < 1) continue;
+                        if (item.Length < 1)
+                        {
+                            continue;
+                        }
                         for (int index = 1; index < item.Length; index++)
                         {
                             var itemOD = new Item();
@@ -1711,7 +2035,10 @@ namespace WebDeApplication.Controllers
                             itemOD.Address = email.address;
 
                             var odList = item[index].Split("target=3D\"_blank\">");
-                            if (odList.Length < 1) continue;
+                            if (odList.Length < 1)
+                            {
+                                continue;
+                            }
                             string[] stringArray = new string[odList.Length - 2];
 
                             for (int odIndex = 2; odIndex < odList.Length; odIndex++)
@@ -1828,203 +2155,11 @@ namespace WebDeApplication.Controllers
                 }
                 _context.SaveChanges();
 
-                // Update email group
-                _context.Database.ExecuteSqlCommand("DELETE FROM [EmailGroup]");
-                var groupStatus = (from e in _context.EmailReader
-                                   where e.ODNumber != null && e.priority != "cancel"
-                                   group e by e.ODNumber into g
-                                   select new { ODNumber = g.Key, status = g.Where(e => e != null).Max(e => e.status2) });
 
-                var result = (from e in _context.EmailReader
-                              join g in groupStatus on e.ODNumber equals g.ODNumber
-                              where e.status2 != null && (e.status2 == g.status || e.status2 == "0")
-                              select new EmailGroup
-                              {
-                                  EmailReaderId = e.Id,
-                                  ODNumber = e.ODNumber,
-                                  address = e.address,
-                                  name = (from em in _context.EmailReader where em.ODNumber == e.ODNumber && em.name != null && em.name != "" select em.name).FirstOrDefault(),
-                                  shippto = e.shippto,
-                                  status = e.status,
-                                  status2 = e.status2,
-                                  MessageId = e.messageId,
-                                  fromAddress = e.fromAddress,
-                                  toAddress = e.toAddress,
-                                  tracking = _context.EmailReader.Where(rd => rd.ODNumber == e.ODNumber && rd.tracking != null && rd.tracking != "").Select(em => em.tracking).FirstOrDefault(),
-                                  orderTotal = _context.EmailReader.Where(rd => rd.ODNumber == e.ODNumber && rd.orderTotal != null && rd.orderTotal != "").Select(em => em.orderTotal).FirstOrDefault(),
-                                  received = e.receivedTime != null ? new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc).AddMilliseconds(double.Parse(e.receivedTime)) : DateTime.MinValue,
-                                  ODParrent = _context.EmailReader.Where(rd => rd.ODNumber == e.ODNumber && rd.odParrent != 0).Select(em => em.odParrent).FirstOrDefault(),
-                                  shipped = e.shipped,
-                                  estimatime = _context.EmailReader.Where(em => em.ODNumber == e.ODNumber && em.status2 == "1").Select(em => em.estimateDilivery).FirstOrDefault(),
-                                  receivedTime = e.receivedTime != null ? new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc).AddMilliseconds(double.Parse(e.receivedTime)).ToLocalTime().ToString("dd-MM-yyyy hh:mm:ss tt") : String.Empty
-                              }).ToList();
-
-                _context.EmailGroup.AddRange(result);
-                _context.SaveChanges();
-
-                var date = DateTime.Now;
-                var dataDashBoard = new DashboardData();
-
-                dataDashBoard.Month = DateTime.Now.Month;
-                dataDashBoard.Year = DateTime.Now.Year;
-                dataDashBoard.SiteName = "Sephora";
-                //email cancel
-                //var cancelInMonth = _context.EmailCancel.Where(e => e.ReceivedTimeFD.Year == date.Year && (e.ReceivedTimeFD.Month == date.Month || e.ReceivedTimeFD.Month == date.Month - 1))
-                //    .GroupBy(e => new { e.ReceivedTimeFD.Year, e.ReceivedTimeFD.Month }).Select(gr => new { MonthYear = gr.Key.Month + '/' + gr.Key.Year, Total = gr.Count() }).ToList();
-
-                //if (cancelInMonth.Count > 0)
-                //{
-                //    var currentMonth = cancelInMonth.Where(e => e.MonthYear == date.Month + '/' + date.Year).FirstOrDefault();
-                //    var previosMonth = cancelInMonth.Where(e => e.MonthYear != date.Month + '/' + date.Year).FirstOrDefault();
-                                  
-                //    if (previosMonth != null && currentMonth != null)
-                //    {
-                //        dataDashBoard.PercentCancel = (currentMonth.Total * 100 / previosMonth.Total) - 100;
-                //    }
-
-                //}
-                dataDashBoard.TotalCancel = _context.EmailCancel.Where(e => e.ODParrent != 0).Count();
-              
-                // Email delay        
-                var emailDelays = _context.EmailGroup.Where(e => e.status.Contains("confirm") && e.estimatime <= date && e.ODParrent != 0).Select(e => new EmailDelay
-                {
-                    //Id = e.EmailId,
-                    tracking = e.tracking,
-                    ODNumber = e.ODNumber,
-                    name = e.name,
-                    ODParrent = e.ODParrent,
-                    shippto = e.shippto,
-                    status = e.status,
-                    fromAddress = e.fromAddress,
-                    receivedTime = e.receivedTime,
-                    shipped = e.shipped,
-                    estimatime = e.estimatime,
-                    orderTotal = e.orderTotal,
-                    MessageId = e.MessageId,
-                    EmailGroupId = e.Id
-                }).ToList();
-
-                _context.EmailDelay.AddRange(emailDelays);
-                _context.SaveChanges();
-                dataDashBoard.TotalDelay = _context.EmailDelay.Where(e => e.shipped == false).Count();
-                // total order
-                var orderItemsCount = _context.EmailGroup.Where(e => e.received.Month == date.Month && e.received.Year == date.Year && e.ODParrent != 0).Count();
-
-
-                dataDashBoard.TotalOrder = _context.EmailGroup.Count();
-                var previosOrder = _context.EmailGroup.Where(e => e.received.Month == date.Month - 1 && e.received.Year == date.Year && e.ODParrent != 0).Count();
-                if(previosOrder != 0)
-                {
-                    dataDashBoard.PercentOrder = orderItemsCount * 100 / previosOrder;
-
-                }
-
-                _context.DataDauVao.ToList().ForEach(d => {
-                    // profit
-                    var total = 0D;
-                    var totalPrevios = 0D;
-                    float offset = d.tyGiaBan - d.tyGiaMua;
-                     //_context.EmailGroup.Where(e => e.ODParrent == d.Id ).ToList().ForEach(
-                     //   oderItem =>
-                     //   {
-                    float a;
-                    int c;
-                    if (d.TongUSD != null)
-                    {
-                        var b = float.TryParse(d.TongUSD, out a);
-                            var e = Int32.TryParse(d.DaMua, out c);
-                        if (b && e)
-                        {
-                            total = offset * a * c;
-                        }
-                    }
-                    //}
-                    //);
-                    var totalNet = 0D;
-                    _context.EmailGroup.Where(e => e.ODParrent == d.Id && (e.shipped == true || e.status2 != "1")).ToList().ForEach(
-                        oderItem =>
-                        {
-                            float e;
-                            if (d.TongUSD != null)
-                            {
-                                var b = float.TryParse(d.TongUSD, out e);
-                                if (b)
-                                {
-                                    totalNet = totalNet + (offset * e);
-                                }
-                            }
-                        }
-                    );
-
-                    var data = new DataProfitOrder();
-                    data.ODnumber = d.ODNumber;
-                    data.Name = d.Name;
-                    data.NgayGui = d.NgayGui;
-                    data.GiaUSD = d.GiaUSD;
-                    data.DaMua = d.DaMua;
-                    data.GiaSale = d.GiaSale;
-                    data.SiteName = "Sephora";
-                    data.TotalProfit = total;
-                    data.tyGiaBan = d.tyGiaBan;
-                    data.tyGiaMua = d.tyGiaMua;
-                    data.DaMua = d.DaMua;
-                    data.CanMua = d.CanMua;
-                    data.orderStop = d.stopOrder;
-                    data.OrderId = d.Id;
-                    data.NetProfit = totalNet;
-
-                    if (_context.DataProfitOrder.Any(dt => dt.OrderId == d.Id))
-                    {
-                        var dprofit = _context.DataProfitOrder.Single(dp => dp.OrderId == d.Id);
-                        dprofit.TotalProfit = data.TotalProfit;
-                        dprofit.ODnumber = d.ODNumber;
-                        dprofit.Name = d.Name;
-                        dprofit.NgayGui = d.NgayGui;
-                        dprofit.GiaUSD = d.GiaUSD;
-                        dprofit.DaMua = d.DaMua;
-                        dprofit.GiaSale = d.GiaSale;
-                        //dprofit.SiteName = "Sephora";
-                        dprofit.TotalProfit = total;
-                        dprofit.tyGiaBan = d.tyGiaBan;
-                        dprofit.tyGiaMua = d.tyGiaMua;
-                        dprofit.DaMua = d.DaMua;
-                        dprofit.CanMua = d.CanMua;
-                        dprofit.orderStop = d.stopOrder;
-                        //dprofit.OrderId = d.Id;
-                        dprofit.NetProfit = totalNet;
-
-                        _context.DataProfitOrder.Update(dprofit);
-
-                    }
-                    else _context.DataProfitOrder.Add(data);
-                    
-                });
-                                    
-                dataDashBoard.TotalProfit = _context.DataProfitOrder.Sum(ord => ord.TotalProfit);
-                //if(totalPrevios > 0) {
-                //    dataDashBoard.PercentProfit = (dataDashBoard.TotalProfit * 100 / totalPrevios);
-                //}
-                if (_context.DashboardData.Count() > 0)
-                {
-                   var data = _context.DashboardData.OrderByDescending(d => d.Id).FirstOrDefault();
-                    data.Month = dataDashBoard.Month;
-                    data.Year = dataDashBoard.Year;
-                    data.PercentCancel = dataDashBoard.PercentCancel;
-                    data.PercentDelay = dataDashBoard.PercentDelay;
-                    data.PercentOrder = dataDashBoard.PercentOrder;
-                    data.PercentProfit = dataDashBoard.PercentProfit;
-                    data.TotalCancel = dataDashBoard.TotalCancel;
-                    data.TotalDelay = dataDashBoard.TotalDelay;
-                    data.TotalOrder = dataDashBoard.TotalOrder;
-                    data.TotalProfit = dataDashBoard.TotalProfit;
-                    data.SiteName = dataDashBoard.SiteName;
-                    _context.DashboardData.Update(data);
-                }
-                else
-                {
-                    _context.DashboardData.Add(dataDashBoard);
-                }
-                _context.SaveChanges();                                          
+                UpdateEmailOrder();
+                UpdateEmailCancel();
+                //UpdateEmailGroup();
+                UpdateDashboardData();
                 return RedirectToAction(nameof(ReadEmail));
 
             }
@@ -2173,6 +2308,9 @@ namespace WebDeApplication.Controllers
                         }
                     }
 
+                }else
+                {
+                    break;
                 }
      
             }
@@ -2316,7 +2454,7 @@ namespace WebDeApplication.Controllers
             {
                 return NotFound();
             }
-            var result = _context.EmailGroup.Where(e => e.ODParrent == dataDauVao.Id && e.name == dataDauVao.Name && e.status2 != "-1").Select(e => new EmailGroup
+            var result = _context.EmailReader.Where(e => e.odParrent == dataDauVao.Id && e.name == dataDauVao.Name && e.status2 != "-1").Select(e => new EmailGroup
             {
                 Id = e.Id,
                 ODNumber = e.ODNumber,
@@ -2329,9 +2467,9 @@ namespace WebDeApplication.Controllers
                 toAddress = e.toAddress,
                 tracking = e.tracking,
                 orderTotal = e.orderTotal,
-                estimatime = e.estimatime,
-                MessageId = e.MessageId,
-                EmailReaderId = e.EmailReaderId,
+                estimatime = e.estimateDilivery,
+                MessageId = e.messageId,
+                EmailReaderId = e.Id,
                 receivedTime = e.receivedTime,
                 
             }).ToList();
@@ -2445,11 +2583,14 @@ namespace WebDeApplication.Controllers
                                 TongVND = d.TongVND,
                                 ShipOrTax = d.ShipOrTax,
                                 Size = d.Size,
-                                Id = d.Id
+                                Id = d.Id,
+                                UserCreate = d.UserCreate,
+                                TyGiaBan = _context.SubProfitOrder.Any(dp => dp.OrderId == d.Id) ? _context.SubProfitOrder.Where(dp => dp.OrderId == d.Id).OrderByDescending(dp => dp.Id).FirstOrDefault().tyGiaBan : d.tyGiaBan,
+                                TyGiaMua = _context.SubProfitOrder.Any(dp => dp.OrderId == d.Id) ? _context.SubProfitOrder.Where(dp => dp.OrderId == d.Id).OrderByDescending(dp => dp.Id).FirstOrDefault().tyGiaMua : d.tyGiaMua
                             }).ToList();
             if (!userRole.Equals("Admin"))
             {
-                joinning = joinning.Where(d => d.Name.Equals(userName)).ToList();
+                joinning = joinning.Where(d => userName.Equals(d.UserCreate)).ToList();
             }
             if (!String.IsNullOrEmpty(Day))
             {
@@ -2522,9 +2663,10 @@ namespace WebDeApplication.Controllers
 
                 dataDauVao.NgayGui = dt.ToString("dd/mm/yyyy");
                 var userId = User.FindFirstValue(ClaimTypes.Name);
-                dataDauVao.Name = userId;
+                dataDauVao.UserCreate = userId;
                 dataDauVao.CreateDate = unixTimestamp;
                 dataDauVao.CreateDateFD = DateTime.Now;
+                dataDauVao.CreateDateFD = DateTimeVn();
                 _context.Add(dataDauVao);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
@@ -2541,6 +2683,14 @@ namespace WebDeApplication.Controllers
             }
 
             var dataDauVao = await _context.DataDauVao.FindAsync(id);
+            if (_context.SubProfitOrder.Any(sub => sub.OrderId == id))
+            {
+                var subData = _context.SubProfitOrder.Where(sub => sub.OrderId == id).OrderByDescending(sub => sub.Id).FirstOrDefault();
+                dataDauVao.tyGiaBan = subData.tyGiaBan;
+                dataDauVao.tyGiaMua = subData.tyGiaMua;
+            }
+        
+
             if (dataDauVao == null)
             {
                 return NotFound();
@@ -2559,7 +2709,7 @@ namespace WebDeApplication.Controllers
             {
                 try
                 {
-                    (from e in _context.EmailGroup
+                    (from e in _context.EmailReader
                      where e.Id == email.Id
                      select e).ToList().ForEach(x => x.shipped = email.shipped);
 
@@ -2569,7 +2719,7 @@ namespace WebDeApplication.Controllers
                 {
                    
 
-                    if (!_context.EmailGroup.Any(e => e.Id == email.Id))
+                    if (!_context.EmailReader.Any(e => e.Id == email.Id))
                     {
                         return NotFound();
                     }
@@ -2587,7 +2737,7 @@ namespace WebDeApplication.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,NgayGui,MaSP,LinkSanPham,Mau,Size,CanMua,DaMua,GiaUSD,GiaSale,ShipOrTax,TongUSD,Rate,TongVND,GhiChu,ODNumber,ItemInTrack,LinkTrack,Payment,Debt,Adress,Name, stopOrder, tyGiaBan, tyGiaMua")] DataDauVao dataDauVao)
+        public async Task<IActionResult> Edit(int id, [Bind("NetProfit, TotalProfit ,CreateDate, CreateDateFD,UserCreate,Id,NgayGui,MaSP,LinkSanPham,Mau,Size,CanMua,DaMua,GiaUSD,GiaSale,ShipOrTax,TongUSD,Rate,TongVND,GhiChu,ODNumber,ItemInTrack,LinkTrack,Payment,Debt,Adress,Name, stopOrder, tyGiaBan, tyGiaMua")] DataDauVao dataDauVao)
         {
             if (id != dataDauVao.Id)
             {
@@ -2598,90 +2748,27 @@ namespace WebDeApplication.Controllers
             {
                 try
                 {
+                    var old = _context.DataDauVao.Where(data => data.Id == dataDauVao.Id).AsNoTracking().FirstOrDefault();
+                    if (dataDauVao.tyGiaMua != old.tyGiaMua || dataDauVao.tyGiaBan != old.tyGiaBan)
+                    {
+                        var sub = new SubProfitOrder();
+                            sub.Name = old.Name;
+                            sub.OrderId = old.Id;
+                            sub.tyGiaBan = dataDauVao.tyGiaBan;
+                            sub.tyGiaMua = dataDauVao.tyGiaMua;
+                            sub.TongUSD = dataDauVao.TongUSD;
+                            sub.Payed = int.Parse(dataDauVao.DaMua);
+                            sub.orderStop = dataDauVao.stopOrder;
+                            sub.ODnumber = dataDauVao.ODNumber;
+                            sub.TotalProfit = 0;
+                            sub.NetProfit = 0;
+                        _context.SubProfitOrder.Add(sub);
+                    } else
+                    {
+                        _context.DataDauVao.Update(dataDauVao);
 
-                    //var dateStr = dataDauVao.NgayGui.Replace("-", "/");
-                    //DateTime dt = DateTime.ParseExact(dateStr, "yyyy/mm/dd", CultureInfo.InvariantCulture);
-                    //dataDauVao.NgayGui = dt.ToString("dd/mm/yyyy");
-                    _context.Update(dataDauVao);
-                    _context.SaveChanges();
-                    _context.DataDauVao.ToList().ForEach(d => {
-                        // profit
-                        var total = 0D;
-                        var totalPrevios = 0D;
-                        float offset = d.tyGiaBan - d.tyGiaMua;                  
-                        float a;
-                        int c;
-                        if (d.TongUSD != null)
-                        {
-                            var b = float.TryParse(d.TongUSD, out a);
-                            var e = Int32.TryParse(d.DaMua, out c);
-                            if (b && e)
-                            {
-                                total = offset * a * c;
-                            }
-                        }
-                        var totalNet = 0D;
-                        _context.EmailGroup.Where(e => e.ODParrent == d.Id && (e.shipped == true || e.status2 != "1")).ToList().ForEach(
-                            oderItem =>
-                            {
-                                float e;
-                                if (d.TongUSD != null)
-                                {
-                                    var b = float.TryParse(d.TongUSD, out e);
-                                    if (b)
-                                    {
-                                        totalNet = totalNet + (offset * e);
-                                    }
-                                }
-                            }
-                        );
+                    }
 
-
-                        var data = new DataProfitOrder();
-                        data.ODnumber = d.ODNumber;
-                        data.Name = d.Name;
-                        data.NgayGui = d.NgayGui;
-                        data.GiaUSD = d.GiaUSD;
-                        data.DaMua = d.DaMua;
-                        data.GiaSale = d.GiaSale;
-                        data.SiteName = "Sephora";
-                        data.TotalProfit = total;
-                        data.tyGiaBan = d.tyGiaBan;
-                        data.tyGiaMua = d.tyGiaMua;
-                        data.DaMua = d.DaMua;
-                        data.CanMua = d.CanMua;
-                        data.orderStop = d.stopOrder;
-                        data.OrderId = d.Id;
-                        data.NetProfit = totalNet;
-
-                        if (_context.DataProfitOrder.Any(dt => dt.OrderId == d.Id))
-                        {
-                            var dprofit = _context.DataProfitOrder.Single(dp => dp.OrderId == d.Id);
-                            dprofit.TotalProfit = data.TotalProfit;
-                            dprofit.ODnumber = d.ODNumber;
-                            dprofit.Name = d.Name;
-                            dprofit.NgayGui = d.NgayGui;
-                            dprofit.GiaUSD = d.GiaUSD;
-                            dprofit.DaMua = d.DaMua;
-                            dprofit.GiaSale = d.GiaSale;
-                            //dprofit.SiteName = "Sephora";
-                            dprofit.TotalProfit = total;
-                            dprofit.tyGiaBan = d.tyGiaBan;
-                            dprofit.tyGiaMua = d.tyGiaMua;
-                            dprofit.DaMua = d.DaMua;
-                            dprofit.CanMua = d.CanMua;
-                            dprofit.orderStop = d.stopOrder;
-                            //dprofit.OrderId = d.Id;
-                            dprofit.NetProfit = totalNet;
-
-                            _context.DataProfitOrder.Update(dprofit);
-
-                        }
-                        //else _context.DataProfitOrder.Add(data);
-
-                    });
-                    var dataDas = _context.DashboardData.OrderByDescending(d => d.Id).FirstOrDefault();
-                    dataDas.TotalProfit = _context.DataProfitOrder.Sum(ord => ord.TotalProfit);
                     _context.SaveChanges();
 
                 }
@@ -2725,6 +2812,13 @@ namespace WebDeApplication.Controllers
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var dataDauVao = await _context.DataDauVao.FindAsync(id);
+            var sub = await _context.SubProfitOrder.Where(d => d.Id == id).ToListAsync();
+            if(sub != null)
+            {
+                _context.SubProfitOrder.RemoveRange(sub);
+
+            }
+
             _context.DataDauVao.Remove(dataDauVao);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
@@ -2824,11 +2918,22 @@ namespace WebDeApplication.Controllers
                         dataDauVao.Debt = worksheet.Cells[row, ++i].Value?.ToString().Trim();
                         dataDauVao.Adress = worksheet.Cells[row, ++i].Value?.ToString().Trim();
                         dataDauVao.Name = worksheet.Cells[row, ++i].Value?.ToString().Trim();
+                        double temp = 0;
+                        double temp1 = 0;
+                        var bol = double.TryParse(worksheet.Cells[row, ++i].Value?.ToString().Trim(), out temp);
+                        dataDauVao.tyGiaMua = temp;
+                        var bol1 = double.TryParse(worksheet.Cells[row, ++i].Value?.ToString().Trim(), out temp1);
+                        dataDauVao.tyGiaBan = temp1;
                         dataDauVao.Status = "check";
-                        DateTime today = DateTime.Now;
-                        long unixTimestamp = (long)(today.Subtract(new DateTime(1970, 1, 1))).TotalMilliseconds;
-                        dataDauVao.CreateDate = unixTimestamp;
+                        DateTime today1 = DateTime.Now;
+                        var today = DateTimeVn();
+                        //long unixTimestamp = (long)(today.Subtract(new DateTime(1970, 1, 1))).TotalMilliseconds;
+                        dataDauVao.CreateDate = UnixtimestampVn();
+                        dataDauVao.CreateDateFD = DateTimeVn();
+
+                        dataDauVao.UserCreate = User.FindFirstValue(ClaimTypes.Name);
                         _context.Add(dataDauVao);
+
                         //list.Add(new UserInfo
                         //{
                         //    UserName = worksheet.Cells[row, 1].Value.ToString().Trim(),

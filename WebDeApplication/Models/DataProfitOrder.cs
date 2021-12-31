@@ -16,8 +16,8 @@ namespace WebDeApplication.Models
         public string NgayGui { get; set; }
         public double TotalProfit { get; set; }
         public string SiteName { get; set; }
-        public int tyGiaMua { get; set; }
-        public int tyGiaBan { get; set; }
+        public double tyGiaMua { get; set; }
+        public double tyGiaBan { get; set; }
         public string CanMua { get; set; }
         public string DaMua { get; set; }
         public string GiaUSD { get; set; }
@@ -25,6 +25,7 @@ namespace WebDeApplication.Models
         public string GiaSale { get; set; }
         public string TongUSD { get; set; }
         public double NetProfit { get; set; }
+        public DateTime CreateDate { get; set; }
 
     }
 }

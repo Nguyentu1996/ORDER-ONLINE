@@ -274,7 +274,7 @@
                                         EstimateTime
                                     </th>
                                     <th>
-                                        Shipped
+                                        Ship
 
                                     </th>
                                 </tr>
@@ -327,7 +327,14 @@
                                                 @Html.DisplayFor(modelitem => item.estimatime)
                                             </td>
                                             <td>
-                                                <a asp-controller="DataDauVaos" asp-action="Shipped" asp-all-route-data="param">Shipped</a>
+                                                @if (item.shipped == false)
+                                                    {
+                                                        <a asp-controller="DataDauVaos" asp-action="Shipped" asp-all-route-data="param">Ship</a>
+
+                                                    } else
+                                                        {
+                                                            <p class="m-0 text-c-yellow"> shipped</p>
+                                                        }
                                             </td>
                                         </tr>
 

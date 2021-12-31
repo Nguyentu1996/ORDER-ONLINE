@@ -20,6 +20,8 @@ namespace WebDeApplication.Models
         [Display(Name = "Màu")]
 
         public string Mau { get; set; }
+        public string UserCreate { get; set; }
+
         //[Display(Name = "Size")]
 
         public string Size { get; set; }
@@ -78,12 +80,14 @@ namespace WebDeApplication.Models
         [Display(Name = "Tỷ giá mua")]
         [Required]
 
-        public int tyGiaMua { get; set; }
+        public double tyGiaMua { get; set; }
         [Display(Name = "Tỷ giá bán")]
         [Required]
 
-        public int tyGiaBan { get; set; }
+        public double tyGiaBan { get; set; }
 
+        public double NetProfit { get; set; }
+        public double TotalProfit { get; set; }
 
     }
 }

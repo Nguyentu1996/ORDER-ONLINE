@@ -202,6 +202,8 @@ namespace WebDeApplication.Migrations
 
                     b.Property<int>("TotalDelay");
 
+                    b.Property<double>("TotalNetProfit");
+
                     b.Property<int>("TotalOrder");
 
                     b.Property<double>("TotalProfit");
@@ -250,6 +252,8 @@ namespace WebDeApplication.Migrations
 
                     b.Property<string>("Name");
 
+                    b.Property<double>("NetProfit");
+
                     b.Property<string>("NgayGui");
 
                     b.Property<string>("ODNumber")
@@ -269,15 +273,21 @@ namespace WebDeApplication.Migrations
 
                     b.Property<string>("TongVND");
 
+                    b.Property<double>("TotalProfit");
+
+                    b.Property<string>("UserCreate");
+
                     b.Property<bool>("isChecked");
 
                     b.Property<bool>("stopOrder");
 
-                    b.Property<int>("tyGiaBan");
+                    b.Property<double>("tyGiaBan");
 
-                    b.Property<int>("tyGiaMua");
+                    b.Property<double>("tyGiaMua");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("Name");
 
                     b.ToTable("DataDauVao");
                 });
@@ -289,6 +299,8 @@ namespace WebDeApplication.Migrations
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("CanMua");
+
+                    b.Property<DateTime>("CreateDate");
 
                     b.Property<string>("DaMua");
 
@@ -314,9 +326,9 @@ namespace WebDeApplication.Migrations
 
                     b.Property<bool>("orderStop");
 
-                    b.Property<int>("tyGiaBan");
+                    b.Property<double>("tyGiaBan");
 
-                    b.Property<int>("tyGiaMua");
+                    b.Property<double>("tyGiaMua");
 
                     b.HasKey("Id");
 
@@ -528,6 +540,43 @@ namespace WebDeApplication.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Item");
+                });
+
+            modelBuilder.Entity("WebDeApplication.Models.SubProfitOrder", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<DateTime>("DateUpdate");
+
+                    b.Property<string>("GiaSale");
+
+                    b.Property<string>("GiaUSD");
+
+                    b.Property<string>("Name");
+
+                    b.Property<double>("NetProfit");
+
+                    b.Property<string>("ODnumber");
+
+                    b.Property<int>("OrderId");
+
+                    b.Property<int>("Payed");
+
+                    b.Property<string>("TongUSD");
+
+                    b.Property<double>("TotalProfit");
+
+                    b.Property<bool>("orderStop");
+
+                    b.Property<double>("tyGiaBan");
+
+                    b.Property<double>("tyGiaMua");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("SubProfitOrder");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>

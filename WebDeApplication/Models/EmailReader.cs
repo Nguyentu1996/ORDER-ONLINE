@@ -38,6 +38,8 @@ namespace WebDeApplication.Models
         public string orderTotal { get; set; }
         public int? odParrent { get; set; }
         public bool shipped { get; set; }
+        public int subProfitId { get; set; }
+
 
     }
 }

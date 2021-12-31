@@ -38,6 +38,12 @@ namespace WebDeApplication.Models.Data
             modelBuilder.Entity<DataDauVao>()
                .HasIndex(p => p.Name)
                .HasFilter(null);
+            modelBuilder.Entity<EmailDelay>()
+              .HasIndex(p => p.ODParrent)
+              .HasFilter(null);
+            modelBuilder.Entity<EmailCancel>()
+              .HasIndex(p => p.ODParrent)
+              .HasFilter(null);
             base.OnModelCreating(modelBuilder);
 
         }

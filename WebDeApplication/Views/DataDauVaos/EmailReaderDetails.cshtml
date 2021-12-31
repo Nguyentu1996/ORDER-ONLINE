@@ -1,4 +1,4 @@
-﻿@model WebDeApplication.Models.EmailGroup
+﻿@model WebDeApplication.Models.EmailReader
 
 @{
     ViewData["Title"] = "EmailReaderDetails";
@@ -33,7 +33,7 @@
                     
 
                             <input type="hidden" asp-for="Id" />
-                            <button type="submit" class="btn btn-primary">Submit</button>
+                            @*<button type="submit" class="btn btn-primary">Submit</button>*@
                             <a asp-action="ReadEmail" class="btn btn-primary">Back</a>
                         </div>
                         <div class="col-md-3">
@@ -44,9 +44,9 @@
                                 <span asp-validation-for="receivedTime" class="text-danger"></span>
                             </div>
                             <div class="form-group">
-                                <label asp-for="estimatime" class="control-label"></label>
-                                <input asp-for="estimatime" class="form-control" readonly />
-                                <span asp-validation-for="estimatime" class="text-danger"></span>
+                                <label asp-for="estimateDilivery" class="control-label"></label>
+                                <input asp-for="estimateDilivery" class="form-control" readonly />
+                                <span asp-validation-for="estimateDilivery" class="text-danger"></span>
                             </div>
                             <div class="form-group">
                                 <label asp-for="address" class="control-label"></label>
@@ -85,14 +85,14 @@
                                 <input asp-for="status" class="form-control" readonly />
                                 <span asp-validation-for="status" class="text-danger"></span>
                             </div>
-                            <div class="form-group text-left m-b-0">
+                            <!--<div class="form-group text-left m-b-0">-->
                                 @*<label asp-for="status" class="control-label" style="opacity:0"></label>*@
-                                <input class="form-control" style="opacity:0" readonly />
+                                @*<input class="form-control" style="opacity:0" readonly />
                                 <div class="checkbox checkbox-primary d-inline">
                                     <input type="checkbox" asp-for="shipped"  id="checkbox-fill-a1">
                                     <label for="checkbox-fill-a1" class="cr"> Shipped</label>
-                                </div>
-                            </div>
+                                </div>*@
+                            <!--</div>-->
                         </div>
                         
                     </form>
