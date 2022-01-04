@@ -331,23 +331,40 @@ namespace WebDeApplication.Controllers
                 _context.EmailDelay.Update(shipped);
                 _context.SaveChanges();
             }
-            if ( emReader != null && emReader.shipped == true) return RedirectToAction("Details", new { id = idOrder, page = page });
+            if ( emReader != null && emReader.shipped == true) return RedirectToAction("Details", new { id = idOrder, page = page });     
 
             if (emReader != null)
             {
-                emReader.shipped = true;
-                _context.EmailReader.Update(emReader);
-                _context.SaveChanges();
-            }
+                if (emReader.subProfitId == -1)
+                {
+                    var order = _context.DataDauVao.Where(d => d.Id == idOrder && d.stopOrder == false).FirstOrDefault();
+                    if (order != null)
+                    {
+                        var currentProfit = ((order.tyGiaBan - order.tyGiaMua) * float.Parse(emReader.orderTotal.Split("$")[1].Trim()));
 
-            var order = _context.DataDauVao.Where(d => d.Id == idOrder && d.stopOrder == false).FirstOrDefault();
-            if(order != null)
-            {
-                
-                order.NetProfit = order.NetProfit + ((order.tyGiaBan - order.tyGiaMua) * float.Parse(order.TongUSD));            
-                _context.SaveChanges();
-              
+                        order.NetProfit = order.NetProfit + currentProfit;
+                        emReader.shipped = true;
+                        _context.EmailReader.Update(emReader);
+                        _context.SaveChanges();
+
+                    }
+                } else
+                {
+                    var order = _context.SubProfitOrder.Where(s => s.Id == emReader.subProfitId).FirstOrDefault();
+                    if (order != null)
+                    {
+                        var currentProfit = ((order.tyGiaBan - order.tyGiaMua) * float.Parse(emReader.orderTotal.Split("$")[1].Trim()));
+
+                        order.NetProfit = order.NetProfit + currentProfit;
+                        emReader.shipped = true;
+                        _context.EmailReader.Update(emReader);
+                        _context.SaveChanges();
+
+                    }
+                }
             }
+           
+
             
             return RedirectToAction("Details", new { id = idOrder, page = page });
         }
@@ -1299,9 +1316,14 @@ namespace WebDeApplication.Controllers
 
                     do {
                         index--;
-                        proccessSubProfit(d, result, subList[index]);
+
+                        if (index >= 0)
+                        {
+                            proccessSubProfit(d, result, subList[index]);
+                        }
+                      
                     }
-                    while (index == 0);
+                    while (index >= 0);
 
                     //// todo
                     var offsetOrder = d.tyGiaBan - d.tyGiaMua;
